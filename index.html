@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我们的爱 - 一周年纪念</title>
+    <!-- 引入 Tailwind CSS 进行快速布局 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts 字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- 引入 FontAwesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- 引入 Confetti 撒花特效 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* 自定义字体设置 */
+        .font-hand {
+            font-family: 'Ma Shan Zheng', cursive;
+        }
+        .font-serif {
+            font-family: 'Noto Serif SC', serif;
+        }
+
+        /* 页面切换动画 */
+        .page-section {
+            display: none; /* 默认隐藏 */
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        .page-section.active {
+            display: block;
+        }
+
+        /* 封面页专属样式 - 粉白色信封主题 */
+        #entrance {
+            background: linear-gradient(135deg, #fff0f5 0%, #fff 100%);
+        }
+
+        /* CSS手绘信封 */
+        .envelope-container {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s;
+            width: 300px;
+            height: 200px;
+            margin: 0 auto; /* 确保自身居中 */
+        }
+        .envelope-container:hover {
+            transform: scale(1.05);
+        }
+        .envelope {
+            width: 300px;
+            height: 200px;
+            background-color: #ffc1cc; /* 信封主体粉色 */
+            position: relative;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        /* 信封盖子 */
+        .envelope::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 100px solid #ffb7c5; /* 盖子颜色略深 */
+            transform-origin: top;
+            transition: transform 0.5s;
+            z-index: 20;
+        }
+        /* 打开信封的动画 */
+        .envelope-container:hover .envelope::before {
+            transform: rotateX(180deg);
+        }
+        /* 信封上的爱心封蜡 */
+        .wax-seal {
+            width: 50px;
+            height: 50px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            position: absolute;
+            top: -25px; /* 在盖子尖端位置 */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 2px solid #fee2e2;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 背景爱心动画 */
+        .hearts-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .heart {
+            position: absolute;
+            bottom: -100px;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 182, 193, 0.6);
+            transform: rotate(45deg);
+            animation: floatHeart 6s linear infinite;
+        }
+        .heart::before, .heart::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 182, 193, 0.6);
+            border-radius: 50%;
+        }
+        .heart::before { top: -10px; left: 0; }
+        .heart::after { left: -10px; top: 0; }
+
+        @keyframes floatHeart {
+            0% { transform: translateY(0) rotate(45deg) scale(0.8); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translateY(-100vh) rotate(45deg) scale(1.2); opacity: 0; }
+        }
+
+        /* 音乐播放按钮旋转动画 */
+        .spin-slow {
+            animation: spin 4s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 滚动显现动画类 */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 照片墙悬停效果 */
+        .photo-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .photo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        
+        /* 理由切换时的淡入淡出 */
+        #reasonDisplay {
+            transition: opacity 0.3s ease;
+        }
+        
+        /* 兑换券样式 */
+        .coupon-card {
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+            border: 2px dashed #fc8181;
+            position: relative;
+            overflow: hidden;
+        }
+        .coupon-card::before, .coupon-card::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #fef2f2; /* matches bg-red-50 */
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .coupon-card::before { left: -10px; }
+        .coupon-card::after { right: -10px; }
+
+        /* 自定义光标 */
+        body {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="%23ff6b6b"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'), auto;
+        }
+    </style>
+</head>
+<body class="bg-red-50 text-gray-800 font-serif overflow-x-hidden min-h-screen">
+
+    <!-- 漂浮爱心背景 (主页才显示) -->
+    <div class="hearts-bg hidden" id="heartsContainer"></div>
+
+    <!-- 音乐控制按钮 (隐藏，直到进入主页) -->
+    <div id="musicControl" class="fixed top-4 right-4 z-50 hidden opacity-0 transition-opacity duration-1000">
+        <button id="musicBtn" class="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-red-500 hover:bg-red-100 transition duration-300">
+            <i class="fas fa-music"></i>
+        </button>
+        <audio id="bgMusic" loop>
+            <!-- 更换为更稳定的MP3源 -->
+            <source src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_24a50d4f3b.mp3?filename=romantic-piano-124976.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <!-- 顶部导航栏 (返回主页) -->
+    <nav id="navBar" class="fixed top-0 left-0 w-full z-40 bg-white/80 backdrop-blur-md shadow-sm py-3 px-6 hidden transition-all duration-300">
+        <button onclick="navigateTo('home')" class="text-red-500 font-hand text-xl hover:text-red-700 flex items-center gap-2">
+            <i class="fas fa-arrow-left"></i> 返回主页
+        </button>
+    </nav>
+
+    <!-- ================= 页面 0: 仪式感入口 (Entrance - 粉色信封版) ================= -->
+    <div id="entrance" class="page-section active h-screen flex flex-col items-center justify-center relative overflow-hidden" onclick="enterWorld()">
+        <!-- 装饰背景 -->
+        <div class="absolute w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        
+        <!-- 使用 flex-col items-center 确保内部元素垂直居中 -->
+        <div class="z-10 flex flex-col items-center justify-center relative group w-full">
+            <h1 class="font-hand text-red-400 text-4xl mb-12 tracking-widest animate-pulse">To My Love</h1>
+            
+            <!-- 信封主体 -->
+            <div class="envelope-container">
+                <div class="envelope">
+                    <div class="wax-seal">
+                        <i class="fas fa-heart text-white text-xl"></i>
+                    </div>
+                    <span class="font-serif text-white text-lg tracking-widest">Click to Open</span>
+                </div>
+            </div>
+
+            <p class="text-red-300 font-serif text-sm mt-12 tracking-[0.2em] uppercase opacity-70">Tap envelope to start</p>
+        </div>
+        
+        <div class="absolute bottom-10 text-red-200 text-xs font-serif">
+            © 2025 Our Story
+        </div>
+    </div>
+
+
+    <!-- ================= 页面 1: 主页 (Home) ================= -->
+    <div id="home" class="page-section">
+        
+        <!-- 第一屏：Hero & 计时器 -->
+        <section class="min-h-screen flex flex-col items-center justify-center relative px-4 text-center">
+            <div class="absolute inset-0 z-[-1]">
+                <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover opacity-20" alt="Background">
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent via-red-50/50 to-red-50"></div>
+            </div>
+
+            <h1 class="font-hand text-5xl md:text-7xl text-red-600 mb-4 animate__animated animate__fadeInDown">我们在一起了</h1>
+            <p class="text-xl md:text-2xl text-gray-600 mb-8 tracking-widest">Since 2025.04.14</p>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl w-full">
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-xl transform hover:scale-105 transition duration-300">
+                    <span id="days" class="block text-4xl md:text-6xl font-bold text-red-500">0</span>
+                    <span class="text-gray-500 text-sm md:text-base">天 (Days)</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-xl transform hover:scale-105 transition duration-300">
+                    <span id="hours" class="block text-4xl md:text-6xl font-bold text-red-500">0</span>
+                    <span class="text-gray-500 text-sm md:text-base">时 (Hours)</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-xl transform hover:scale-105 transition duration-300">
+                    <span id="minutes" class="block text-4xl md:text-6xl font-bold text-red-500">0</span>
+                    <span class="text-gray-500 text-sm md:text-base">分 (Minutes)</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-xl transform hover:scale-105 transition duration-300">
+                    <span id="seconds" class="block text-4xl md:text-6xl font-bold text-red-500">0</span>
+                    <span class="text-gray-500 text-sm md:text-base">秒 (Seconds)</span>
+                </div>
+            </div>
+
+            <button onclick="triggerConfetti()" class="mt-12 px-8 py-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition shadow-lg font-hand text-xl animate-bounce">
+                点我庆祝 ❤️
+            </button>
+        </section>
+
+        <!-- 第二屏：爱情时间轴 -->
+        <section class="py-20 px-4 max-w-4xl mx-auto">
+            <h2 class="text-center font-hand text-4xl text-red-800 mb-16 reveal">我们的故事</h2>
+            <div class="relative border-l-4 border-red-200 ml-4 md:ml-0 space-y-12">
+                <!-- 事件 1 -->
+                <div class="relative pl-8 md:pl-0 reveal">
+                    <div class="absolute -left-[10px] top-0 w-6 h-6 bg-red-500 rounded-full border-4 border-white shadow"></div>
+                    <div class="md:flex md:justify-between items-center group">
+                        <div class="md:w-[45%] md:text-right md:pr-8 mb-2 md:mb-0">
+                            <span class="inline-block px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm font-bold">2023.01.01</span>
+                        </div>
+                        <div class="md:w-[45%] md:pl-8 bg-white p-6 rounded-xl shadow-md photo-card">
+                            <h3 class="font-bold text-xl mb-2">第一次相遇</h3>
+                            <p class="text-gray-600">在那家咖啡店，阳光洒在你的侧脸，我就知道，故事开始了。</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- 事件 2 -->
+                <div class="relative pl-8 md:pl-0 reveal">
+                    <div class="absolute -left-[10px] top-0 w-6 h-6 bg-red-400 rounded-full border-4 border-white shadow"></div>
+                    <div class="md:flex md:justify-between items-center flex-row-reverse group">
+                        <div class="md:w-[45%] md:text-left md:pl-8 mb-2 md:mb-0">
+                            <span class="inline-block px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm font-bold">2023.02.14</span>
+                        </div>
+                        <div class="md:w-[45%] md:pr-8 md:text-right">
+                            <div class="bg-white p-6 rounded-xl shadow-md photo-card inline-block text-left">
+                                <h3 class="font-bold text-xl mb-2">第一次告白</h3>
+                                <p class="text-gray-600">紧张得手心出汗，但听到你说"我愿意"时，世界都亮了。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第三屏：照片墙 -->
+        <section class="py-20 bg-white">
+            <div class="max-w-6xl mx-auto px-4">
+                <h2 class="text-center font-hand text-4xl text-red-800 mb-12 reveal">甜蜜瞬间</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="relative h-80 rounded-2xl overflow-hidden group reveal photo-card">
+                        <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=1974&auto=format&fit=crop" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                    </div>
+                    <div class="relative h-80 rounded-2xl overflow-hidden group reveal photo-card">
+                        <img src="https://images.unsplash.com/photo-1621091211034-53136cc1eb32?q=80&w=1974&auto=format&fit=crop" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                    </div>
+                    <div class="relative h-80 rounded-2xl overflow-hidden group reveal photo-card">
+                        <img src="https://images.unsplash.com/photo-1516054575922-f0b8eeadec1a?q=80&w=1974&auto=format&fit=crop" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第四屏：爱你的100个理由 -->
+        <section class="py-20 bg-red-50">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <h2 class="text-center font-hand text-4xl text-red-800 mb-12 reveal">爱你的100个理由</h2>
+                <div class="bg-white p-10 rounded-3xl shadow-xl relative transform transition duration-500 hover:scale-[1.02] border-2 border-red-100 reveal">
+                    <i class="fas fa-quote-left text-5xl text-red-100 absolute top-6 left-6"></i>
+                    <div class="min-h-[120px] flex items-center justify-center py-6 px-8">
+                        <p id="reasonDisplay" class="font-serif text-2xl md:text-3xl text-gray-700 leading-relaxed">
+                            点击下方按钮，抽取我对你的爱意 ❤️
+                        </p>
+                    </div>
+                    <i class="fas fa-quote-right text-5xl text-red-100 absolute bottom-6 right-6"></i>
+                </div>
+                <button onclick="displayNextReason()" class="mt-10 px-10 py-4 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full hover:from-red-600 hover:to-pink-600 transition shadow-lg font-hand text-2xl animate-pulse">
+                    随机抽取一条理由
+                </button>
+            </div>
+        </section>
+
+        <!-- 第五屏：给你的信 -->
+        <section class="py-20 px-4">
+            <div class="max-w-2xl mx-auto bg-white p-8 md:p-12 rounded-lg shadow-2xl border border-red-100 relative reveal">
+                <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full bg-red-400 border-2 border-white shadow-md"></div>
+                <h2 class="font-hand text-3xl text-center mb-8 text-gray-800">给最亲爱的你</h2>
+                <div class="font-serif text-lg leading-loose text-gray-700 min-h-[200px]" id="typewriter"></div>
+                <div class="text-right mt-8 font-hand text-xl text-red-500">—— 永远爱你的我</div>
+            </div>
+        </section>
+
+        <!-- 更多功能入口 (导航区) -->
+        <section class="py-20 bg-white">
+            <div class="max-w-5xl mx-auto px-4">
+                <h2 class="text-center font-hand text-4xl text-red-800 mb-12">更多惊喜</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 入口 1 -->
+                    <div onclick="navigateTo('coupons')" class="cursor-pointer group relative overflow-hidden rounded-2xl shadow-lg h-64 bg-gradient-to-br from-pink-100 to-red-100 flex flex-col items-center justify-center text-center transition-transform hover:-translate-y-2">
+                        <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition duration-300"></div>
+                        <i class="fas fa-ticket-alt text-6xl text-red-400 mb-4 group-hover:scale-110 transition duration-300"></i>
+                        <h3 class="font-hand text-3xl text-gray-800">恋爱兑换券</h3>
+                        <p class="mt-2 text-gray-600">专属特权，点击领取</p>
+                    </div>
+                    <!-- 入口 2 -->
+                    <div onclick="navigateTo('footprints')" class="cursor-pointer group relative overflow-hidden rounded-2xl shadow-lg h-64 bg-gradient-to-br from-blue-100 to-indigo-100 flex flex-col items-center justify-center text-center transition-transform hover:-translate-y-2">
+                        <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition duration-300"></div>
+                        <i class="fas fa-map-marked-alt text-6xl text-indigo-400 mb-4 group-hover:scale-110 transition duration-300"></i>
+                        <h3 class="font-hand text-3xl text-gray-800">我们的足迹</h3>
+                        <p class="mt-2 text-gray-600">去过的每一个地方</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="py-6 text-center text-gray-400 text-sm bg-gray-50">
+            <p>Created with ❤️ for Our Anniversary</p>
+        </footer>
+    </div>
+
+    <!-- ================= 页面 2: 恋爱兑换券 (Coupons) ================= -->
+    <div id="coupons" class="page-section min-h-screen bg-red-50 py-20 px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-center font-hand text-5xl text-red-800 mb-4">恋爱特权券</h2>
+            <p class="text-center text-gray-500 mb-12">最终解释权归我所有 (大概吧😝)</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 券 1 -->
+                <div class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-2xl text-red-500 mb-2">按摩券</h3>
+                        <p class="text-gray-500 text-sm">凭此券可享受全套按摩服务30分钟</p>
+                        <p class="text-xs text-gray-400 mt-2">有效期：永久有效</p>
+                    </div>
+                    <div class="border-l-2 border-dashed border-red-200 pl-4 flex flex-col items-center justify-center">
+                        <i class="fas fa-hand-sparkles text-3xl text-red-300 mb-2"></i>
+                        <button class="px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600">使用</button>
+                    </div>
+                </div>
+                 <!-- 券 2 -->
+                <div class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-2xl text-red-500 mb-2">消气券</h3>
+                        <p class="text-gray-500 text-sm">吵架时出示，无条件和好，不能生气</p>
+                        <p class="text-xs text-gray-400 mt-2">有效期：永久有效</p>
+                    </div>
+                    <div class="border-l-2 border-dashed border-red-200 pl-4 flex flex-col items-center justify-center">
+                        <i class="fas fa-smile-beam text-3xl text-red-300 mb-2"></i>
+                        <button class="px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600">使用</button>
+                    </div>
+                </div>
+                 <!-- 券 3 -->
+                <div class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-2xl text-red-500 mb-2">清空购物车</h3>
+                        <p class="text-gray-500 text-sm">预算范围内，买你喜欢的一个礼物</p>
+                        <p class="text-xs text-gray-400 mt-2">有效期：本年度</p>
+                    </div>
+                    <div class="border-l-2 border-dashed border-red-200 pl-4 flex flex-col items-center justify-center">
+                        <i class="fas fa-shopping-bag text-3xl text-red-300 mb-2"></i>
+                        <button class="px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600">使用</button>
+                    </div>
+                </div>
+                <!-- 券 4 -->
+                <div class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-2xl text-red-500 mb-2">大餐券</h3>
+                        <p class="text-gray-500 text-sm">想吃什么随便点，我买单/我做饭</p>
+                        <p class="text-xs text-gray-400 mt-2">有效期：永久有效</p>
+                    </div>
+                    <div class="border-l-2 border-dashed border-red-200 pl-4 flex flex-col items-center justify-center">
+                        <i class="fas fa-utensils text-3xl text-red-300 mb-2"></i>
+                        <button class="px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600">使用</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <button onclick="navigateTo('home')" class="px-8 py-3 border-2 border-red-500 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition">返回主页</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 页面 3: 我们的足迹 (Footprints - 已更新) ================= -->
+    <div id="footprints" class="page-section min-h-screen bg-indigo-50 py-20 px-4">
+        <div class="max-w-3xl mx-auto text-center">
+            <h2 class="font-hand text-5xl text-indigo-800 mb-4">一起走过的路</h2>
+            <p class="text-gray-500 mb-12">世界很大，幸好有你陪我看</p>
+            
+            <!-- 这里用一个简单的列表代替地图，你可以放地图截图 -->
+            <div class="space-y-6">
+                <!-- Melaka 机场街 -->
+                <div class="bg-white p-6 rounded-xl shadow-lg flex items-center gap-4 transform hover:scale-105 transition">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-2xl">🏮</div>
+                    <div class="text-left">
+                        <h3 class="font-bold text-xl text-gray-800">Melaka 机场街</h3>
+                        <p class="text-gray-500">漫步在Jonker Walk，热闹的夜市和古老的建筑，还有你的笑脸。</p>
+                    </div>
+                </div>
+                
+                <!-- Port Dickson 看日出 -->
+                <div class="bg-white p-6 rounded-xl shadow-lg flex items-center gap-4 transform hover:scale-105 transition">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center text-2xl">🌅</div>
+                    <div class="text-left">
+                        <h3 class="font-bold text-xl text-gray-800">Port Dickson 看日出</h3>
+                        <p class="text-gray-500">在海边静静等待第一缕阳光，那一刻，时间仿佛静止了。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 p-8 bg-white/50 rounded-xl border-2 border-dashed border-indigo-200">
+                <p class="font-hand text-2xl text-indigo-400">未完待续... 下一站去哪里？</p>
+            </div>
+            
+            <div class="text-center mt-12">
+                <button onclick="navigateTo('home')" class="px-8 py-3 border-2 border-indigo-500 text-indigo-500 rounded-full hover:bg-indigo-500 hover:text-white transition">返回主页</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. 核心逻辑：从入口进入世界 ---
+        function enterWorld() {
+            // 隐藏入口
+            document.getElementById('entrance').style.display = 'none';
+            // 显示主页
+            document.getElementById('home').classList.add('active');
+            
+            // 显示音乐控制和背景爱心
+            document.getElementById('musicControl').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('musicControl').classList.remove('opacity-0');
+            }, 100);
+            document.getElementById('heartsContainer').classList.remove('hidden');
+
+            // 尝试自动播放音乐 (用户已有交互，通常允许播放)
+            const bgMusic = document.getElementById('bgMusic');
+            const musicBtn = document.getElementById('musicBtn');
+            
+            // 设置音量为 20% (更温柔)
+            bgMusic.volume = 0.2; 
+            
+            bgMusic.play().then(() => {
+                // 播放成功，让图标转起来
+                musicBtn.classList.add('spin-slow');
+                musicBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                isPlaying = true;
+            }).catch(e => {
+                console.log("浏览器阻止了自动播放，需手动点击音乐图标");
+                // 如果自动播放失败，显示提示
+                // alert("请点击右上角的音乐图标播放音乐哦~");
+            });
+
+            // 来一波开场庆祝撒花
+            triggerConfetti();
+        }
+
+        // --- 2. 页面导航逻辑 ---
+        function navigateTo(pageId) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            // 显示目标页面
+            document.getElementById(pageId).classList.add('active');
+            
+            // 滚动到顶部
+            window.scrollTo(0, 0);
+
+            // 控制顶部导航栏显示 (主页不显示返回按钮)
+            const navBar = document.getElementById('navBar');
+            if (pageId === 'home') {
+                navBar.classList.add('hidden');
+            } else {
+                navBar.classList.remove('hidden');
+            }
+        }
+
+        // --- 3. 100个理由全集 ---
+        const reasons = [
+            "因为你的笑容比阳光还灿烂",
+            "因为你总是能包容我的小脾气",
+            "因为你做的菜太好吃了",
+            "因为和你在一起，发呆也觉得美好",
+            "因为你记得关于我的一切小细节",
+            "因为你是这个世界上最懂我的人",
+            "因为你的拥抱总是那么温暖",
+            "因为你认真工作的样子很迷人",
+            "因为我们有聊不完的话题",
+            "因为想到未来有你，我就充满了期待",
+            "因为你总是支持我的每一个决定",
+            "因为你身上的味道让我觉得安心",
+            "因为你让我变成了更好的人",
+            "因为你会在过马路时下意识牵住我的手",
+            "因为你看着我的时候，眼睛里有星星",
+            "因为你的声音很好听，百听不厌",
+            "因为你无论多忙都会回我的消息",
+            "因为你就是你，独一无二的你",
+            "因为你给了我从未有过的安全感",
+            "因为我爱你，没有任何理由",
+            "因为你睡觉的样子很可爱",
+            "因为你吃东西的时候像小仓鼠",
+            "因为你总是把好吃的留给我",
+            "因为你会在我难过时静静陪着我",
+            "因为你记得我的生理期/不舒服的日子",
+            "因为你为了我们的未来在努力",
+            "因为你孝顺父母，心地善良",
+            "因为你喜欢小动物，很有爱心",
+            "因为你的衣品很好",
+            "因为你唱歌很好听（或者很搞笑）",
+            "因为你总是能接住我的梗",
+            "因为和你一起看电影是最棒的约会",
+            "因为你会在下雨天为我撑伞",
+            "因为你会在天冷时提醒我加衣",
+            "因为你从来不吝啬对我的夸奖",
+            "因为你让我觉得我是世界上最幸福的人",
+            "因为我们三观一致",
+            "因为你尊重我的爱好",
+            "因为你愿意陪我做幼稚的事情",
+            "因为你总是把我放在第一位",
+            "因为你的手很暖和",
+            "因为你走路总是让我走内侧",
+            "因为你会在睡前跟我说晚安",
+            "因为你会在醒来时第一时间找我",
+            "因为你的幽默感总是能逗笑我",
+            "因为你做事有条理，很可靠",
+            "因为你答应我的事情都会做到",
+            "因为你从不对我撒谎",
+            "因为你愿意听我发牢骚",
+            "因为你总是能发现生活中的小确幸",
+            "因为你拍的照片很好看",
+            "因为你愿意教我我不懂的事情",
+            "因为你从不嫌弃我笨",
+            "因为你总是鼓励我尝试新事物",
+            "因为你记得每一个纪念日",
+            "因为你会给我准备惊喜",
+            "因为你写的信/卡片很感人",
+            "因为你愿意陪我吃我不喜欢但你喜欢的东西",
+            "因为你为了我改变了很多",
+            "因为你让我相信爱情",
+            "因为你是我最好的朋友",
+            "因为你是我最亲密的爱人",
+            "因为你是我灵魂的另一半",
+            "因为遇见你花光了我所有的运气",
+            "因为你总是能让我冷静下来",
+            "因为你让我觉得人间值得",
+            "因为你喜欢我不完美的样子",
+            "因为你见过我最丑的样子依然爱我",
+            "因为你愿意陪我回娘家/回家",
+            "因为你总是护短，站在我这边",
+            "因为你很有上进心",
+            "因为你生活习惯很好",
+            "因为你爱干净",
+            "因为你做的早餐很好吃",
+            "因为你帮我吹头发的时候很温柔",
+            "因为你系鞋带的样子很帅/美",
+            "因为你开车的时候很专注",
+            "因为你总是让着我",
+            "因为你从来不大声吼我",
+            "因为你愿意花时间陪我",
+            "因为你记得我喜欢喝什么奶茶",
+            "因为你记得我忌口的东西",
+            "因为你总是能看穿我的逞强",
+            "因为你是我疲惫生活的解药",
+            "因为你是我想共度余生的人",
+            "因为你让我不想再流浪",
+            "因为你给了我一个家",
+            "因为你的眼神总是充满爱意",
+            "因为你总是夸我好看",
+            "因为你让我自信",
+            "因为你让我不再孤单",
+            "因为你是我的一日三餐",
+            "因为你是我的一年四季",
+            "因为你是我生命中的光",
+            "因为我想和你从黑发到白头",
+            "因为这辈子，下辈子，我都想和你在一起",
+            "因为...未完待续，每天多爱你一点"
+        ];
+
+        // --- 4. 配置区域 ---
+        const config = {
+            startDate: "2025-04-14T00:00:00", 
+            loveLetter: "亲爱的，\n不知不觉我们已经走过了一年。\n感谢你包容我的小脾气，\n感谢你带来的所有温暖。\n未来的日子很长，\n但我只想和你一起慢慢变老。\n一周年快乐！❤️"
+        };
+
+        // --- 5. 随机理由显示 ---
+        function displayNextReason() {
+            const display = document.getElementById('reasonDisplay');
+            const randomReason = reasons[Math.floor(Math.random() * reasons.length)];
+            display.style.opacity = 0;
+            setTimeout(() => {
+                display.innerText = randomReason;
+                display.style.opacity = 1;
+            }, 300);
+            confetti({
+                particleCount: 30,
+                spread: 50,
+                origin: { y: 0.8 },
+                colors: ['#ffb6c1', '#ff69b4']
+            });
+        }
+
+        // --- 6. 计时器逻辑 ---
+        function updateTimer() {
+            const start = new Date(config.startDate).getTime();
+            const now = new Date().getTime();
+            const diff = now - start;
+
+            if (diff < 0) {
+                document.getElementById("days").innerText = "0";
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = days;
+            document.getElementById("hours").innerText = hours;
+            document.getElementById("minutes").innerText = minutes;
+            document.getElementById("seconds").innerText = seconds;
+        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // --- 7. 打字机效果 ---
+        const letterElem = document.getElementById("typewriter");
+        let charIndex = 0;
+        function typeWriter() {
+            if (charIndex < config.loveLetter.length) {
+                const char = config.loveLetter.charAt(charIndex);
+                letterElem.innerHTML += char === '\n' ? '<br>' : char;
+                charIndex++;
+                setTimeout(typeWriter, 100); 
+            }
+        }
+        const letterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    typeWriter();
+                    letterObserver.disconnect();
+                }
+            });
+        });
+        letterObserver.observe(letterElem);
+
+        // --- 8. 滚动显现动画 ---
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // --- 9. 撒花特效 ---
+        function triggerConfetti() {
+            const duration = 3000;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff0000', '#ffa500', '#ffff00'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff0000', '#ffa500', '#ffff00'] });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        }
+
+        // --- 10. 音乐控制 ---
+        const musicBtn = document.getElementById('musicBtn');
+        const bgMusic = document.getElementById('bgMusic');
+        let isPlaying = false;
+        musicBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                bgMusic.pause();
+                musicBtn.classList.remove('spin-slow');
+                musicBtn.innerHTML = '<i class="fas fa-music"></i>';
+            } else {
+                bgMusic.play();
+                musicBtn.classList.add('spin-slow');
+                musicBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // --- 11. 背景爱心 ---
+        function createHearts() {
+            const container = document.getElementById('heartsContainer');
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = Math.random() * 3 + 3 + 's';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(heart);
+            }
+        }
+        createHearts();
+    </script>
+</body>
+</html>
