@@ -210,8 +210,8 @@
             <i class="fas fa-music"></i>
         </button>
         <audio id="bgMusic" loop>
-            <!-- 更换为更稳定的MP3源 -->
-            <source src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_24a50d4f3b.mp3?filename=romantic-piano-124976.mp3" type="audio/mpeg">
+            <!-- 已修改为本地文件 music.mp3 -->
+            <source src="music.mp3" type="audio/mpeg">
         </audio>
     </div>
 
@@ -227,8 +227,11 @@
         <!-- 装饰背景 -->
         <div class="absolute w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         
-        <!-- 使用 flex-col items-center 确保内部元素垂直居中 -->
-        <div class="z-10 flex flex-col items-center justify-center relative group w-full">
+        <!-- 
+            修改处：增加了 mt-32 (margin-top) 让整个信封区域往下移。
+            justify-center 会垂直居中，加了 padding 或 margin 可以打破这个平衡使其下移。
+        -->
+        <div class="z-10 flex flex-col items-center justify-center relative group w-full mt-32">
             <h1 class="font-hand text-red-400 text-4xl mb-12 tracking-widest animate-pulse">To My Love</h1>
             
             <!-- 信封主体 -->
