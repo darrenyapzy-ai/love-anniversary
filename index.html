@@ -207,10 +207,15 @@
     <!-- 音乐控制按钮 (隐藏，直到进入主页) -->
     <div id="musicControl" class="fixed top-4 right-4 z-50 hidden opacity-0 transition-opacity duration-1000">
         <button id="musicBtn" class="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-red-500 hover:bg-red-100 transition duration-300">
+            <!-- 默认显示静音/加载状态 -->
             <i class="fas fa-music"></i>
         </button>
-        <audio id="bgMusic" loop>
-            <!-- 已修改为本地文件 music.mp3 -->
+        <!-- 
+            优化：
+            1. preload="auto" 
+            2. 增加了 onwaiting 和 onplaying 事件监听，控制按钮状态
+        -->
+        <audio id="bgMusic" loop preload="auto">
             <source src="music.mp3" type="audio/mpeg">
         </audio>
     </div>
@@ -222,15 +227,11 @@
         </button>
     </nav>
 
-    <!-- ================= 页面 0: 仪式感入口 (Entrance - 粉色信封版) ================= -->
+    <!-- ================= 页面 0: 仪式感入口 (Entrance) ================= -->
     <div id="entrance" class="page-section active h-screen flex flex-col items-center justify-center relative overflow-hidden" onclick="enterWorld()">
         <!-- 装饰背景 -->
         <div class="absolute w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         
-        <!-- 
-            修改处：增加了 mt-32 (margin-top) 让整个信封区域往下移。
-            justify-center 会垂直居中，加了 padding 或 margin 可以打破这个平衡使其下移。
-        -->
         <div class="z-10 flex flex-col items-center justify-center relative group w-full mt-32">
             <h1 class="font-hand text-red-400 text-4xl mb-12 tracking-widest animate-pulse">To My Love</h1>
             
@@ -501,7 +502,62 @@
     </div>
 
     <script>
-        // --- 1. 核心逻辑：从入口进入世界 ---
+        // --- 1. 音乐控制 & 状态逻辑 ---
+        const musicBtn = document.getElementById('musicBtn');
+        const bgMusic = document.getElementById('bgMusic');
+        let isPlaying = false;
+
+        // 设置 "加载中" 状态的函数
+        function setLoadingState() {
+            musicBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; // 显示旋转的加载图标
+            musicBtn.classList.remove('spin-slow');
+        }
+
+        // 设置 "播放中" 状态的函数
+        function setPlayingState() {
+            musicBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            musicBtn.classList.add('spin-slow');
+            isPlaying = true;
+        }
+
+        // 设置 "暂停" 状态的函数
+        function setPausedState() {
+            musicBtn.innerHTML = '<i class="fas fa-music"></i>';
+            musicBtn.classList.remove('spin-slow');
+            isPlaying = false;
+        }
+
+        // 监听音频缓冲事件 (当由于缺乏数据而暂停时触发)
+        bgMusic.addEventListener('waiting', () => {
+            console.log("音频正在缓冲...");
+            setLoadingState();
+        });
+
+        // 监听音频可以播放事件
+        bgMusic.addEventListener('playing', () => {
+            console.log("音频开始播放");
+            setPlayingState();
+        });
+        
+        // 监听音频暂停
+        bgMusic.addEventListener('pause', () => {
+            setPausedState();
+        });
+
+        // 音乐按钮点击事件
+        musicBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                bgMusic.pause();
+            } else {
+                setLoadingState(); // 点击后立即显示加载
+                bgMusic.play().catch(e => {
+                    console.log("播放失败:", e);
+                    setPausedState(); // 如果失败，恢复图标
+                });
+            }
+        });
+
+        // --- 2. 核心逻辑：从入口进入世界 ---
         function enterWorld() {
             // 隐藏入口
             document.getElementById('entrance').style.display = 'none';
@@ -515,29 +571,23 @@
             }, 100);
             document.getElementById('heartsContainer').classList.remove('hidden');
 
-            // 尝试自动播放音乐 (用户已有交互，通常允许播放)
-            const bgMusic = document.getElementById('bgMusic');
-            const musicBtn = document.getElementById('musicBtn');
-            
-            // 设置音量为 20% (更温柔)
+            // 尝试自动播放音乐
+            setLoadingState(); // 立即显示加载状态，给用户反馈
             bgMusic.volume = 0.2; 
             
             bgMusic.play().then(() => {
-                // 播放成功，让图标转起来
-                musicBtn.classList.add('spin-slow');
-                musicBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                isPlaying = true;
+                // 如果缓冲够快，会直接进入 playing 事件，这里不需要额外操作
             }).catch(e => {
-                console.log("浏览器阻止了自动播放，需手动点击音乐图标");
-                // 如果自动播放失败，显示提示
-                // alert("请点击右上角的音乐图标播放音乐哦~");
+                console.log("自动播放被阻止或出错:", e);
+                // 此时图标仍是 Loading 或 静音，用户可以手动点击
+                setPausedState(); 
             });
 
             // 来一波开场庆祝撒花
             triggerConfetti();
         }
 
-        // --- 2. 页面导航逻辑 ---
+        // --- 3. 页面导航逻辑 ---
         function navigateTo(pageId) {
             // 隐藏所有页面
             document.querySelectorAll('.page-section').forEach(el => {
@@ -558,7 +608,7 @@
             }
         }
 
-        // --- 3. 100个理由全集 ---
+        // --- 4. 100个理由全集 ---
         const reasons = [
             "因为你的笑容比阳光还灿烂",
             "因为你总是能包容我的小脾气",
@@ -659,13 +709,13 @@
             "因为...未完待续，每天多爱你一点"
         ];
 
-        // --- 4. 配置区域 ---
+        // --- 5. 配置区域 ---
         const config = {
             startDate: "2025-04-14T00:00:00", 
             loveLetter: "亲爱的，\n不知不觉我们已经走过了一年。\n感谢你包容我的小脾气，\n感谢你带来的所有温暖。\n未来的日子很长，\n但我只想和你一起慢慢变老。\n一周年快乐！❤️"
         };
 
-        // --- 5. 随机理由显示 ---
+        // --- 6. 随机理由显示 ---
         function displayNextReason() {
             const display = document.getElementById('reasonDisplay');
             const randomReason = reasons[Math.floor(Math.random() * reasons.length)];
@@ -682,7 +732,7 @@
             });
         }
 
-        // --- 6. 计时器逻辑 ---
+        // --- 7. 计时器逻辑 ---
         function updateTimer() {
             const start = new Date(config.startDate).getTime();
             const now = new Date().getTime();
@@ -706,7 +756,7 @@
         setInterval(updateTimer, 1000);
         updateTimer();
 
-        // --- 7. 打字机效果 ---
+        // --- 8. 打字机效果 ---
         const letterElem = document.getElementById("typewriter");
         let charIndex = 0;
         function typeWriter() {
@@ -727,7 +777,7 @@
         });
         letterObserver.observe(letterElem);
 
-        // --- 8. 滚动显现动画 ---
+        // --- 9. 滚动显现动画 ---
         const revealElements = document.querySelectorAll('.reveal');
         const revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -738,7 +788,7 @@
         }, { threshold: 0.1 });
         revealElements.forEach(el => revealObserver.observe(el));
 
-        // --- 9. 撒花特效 ---
+        // --- 10. 撒花特效 ---
         function triggerConfetti() {
             const duration = 3000;
             const end = Date.now() + duration;
@@ -748,23 +798,6 @@
                 if (Date.now() < end) { requestAnimationFrame(frame); }
             }());
         }
-
-        // --- 10. 音乐控制 ---
-        const musicBtn = document.getElementById('musicBtn');
-        const bgMusic = document.getElementById('bgMusic');
-        let isPlaying = false;
-        musicBtn.addEventListener('click', () => {
-            if (isPlaying) {
-                bgMusic.pause();
-                musicBtn.classList.remove('spin-slow');
-                musicBtn.innerHTML = '<i class="fas fa-music"></i>';
-            } else {
-                bgMusic.play();
-                musicBtn.classList.add('spin-slow');
-                musicBtn.innerHTML = '<i class="fas fa-pause"></i>';
-            }
-            isPlaying = !isPlaying;
-        });
 
         // --- 11. 背景爱心 ---
         function createHearts() {
