@@ -21,21 +21,20 @@
 
         #entrance { background: linear-gradient(135deg, #fff0f5 0%, #fff 100%); }
 
-        /* --- 放大版信封样式 Start --- */
-        /* 这里的尺寸已经调整为 360px x 240px (原 300x200) */
+        /* --- 放大版信封样式 (保持您需要的大小) --- */
         .envelope-container {
             position: relative;
             cursor: pointer;
             transition: transform 0.3s;
-            width: 360px;  /* 宽度加大 */
-            height: 240px; /* 高度加大 */
+            width: 360px;  /* 宽度 */
+            height: 240px; /* 高度 */
             margin: 0 auto;
         }
         .envelope-container:hover { transform: scale(1.05); }
 
         .envelope {
-            width: 360px;  /* 宽度加大 */
-            height: 240px; /* 高度加大 */
+            width: 360px;
+            height: 240px;
             background-color: #ffc1cc;
             position: relative;
             border-radius: 10px;
@@ -46,7 +45,7 @@
             z-index: 10;
         }
 
-        /* 信封盖子 - 需要配合宽度调整 */
+        /* 信封盖子 */
         .envelope::before {
             content: '';
             position: absolute;
@@ -54,21 +53,18 @@
             left: 0;
             width: 0;
             height: 0;
-            /* 左右边框必须是宽度的一半 (360 / 2 = 180px) */
             border-left: 180px solid transparent; 
             border-right: 180px solid transparent;
-            /* 顶部边框决定盖子高度，稍微加高一点 */
             border-top: 130px solid #ffb7c5; 
             transform-origin: top;
             transition: transform 0.5s;
             z-index: 20;
         }
-        /* --- 放大版信封样式 End --- */
 
         .envelope-container:hover .envelope::before { transform: rotateX(180deg); }
 
         .wax-seal {
-            width: 60px; /* 封蜡也稍微加大 */
+            width: 60px; 
             height: 60px;
             background-color: #ef4444;
             border-radius: 50%;
@@ -150,8 +146,8 @@
         <button id="musicBtn" class="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-red-500 hover:bg-red-100 transition duration-300">
             <i class="fas fa-music"></i>
         </button>
-        <!-- 优化：preload="auto" 配合 JS 的 window.onload 强制预加载 -->
-        <audio id="bgMusic" loop preload="auto">
+        <!-- 添加了错误监听 onerror -->
+        <audio id="bgMusic" loop preload="auto" onerror="handleMusicError()">
             <source src="music.mp3" type="audio/mpeg">
         </audio>
     </div>
@@ -166,7 +162,6 @@
     <div id="entrance" class="page-section active h-screen flex flex-col items-center justify-center relative overflow-hidden" onclick="enterWorld()">
         <div class="absolute w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         
-        <!-- 增加了 mt-20，让信封稍微往下一点，不要顶得太高 -->
         <div class="z-10 flex flex-col items-center justify-center relative group w-full mt-20">
             <h1 class="font-hand text-red-400 text-5xl mb-16 tracking-widest animate-pulse">To My Love</h1>
             
@@ -435,15 +430,25 @@
             musicBtn.classList.remove('spin-slow');
             isPlaying = false;
         }
+        
+        // 新增：错误处理
+        function handleMusicError() {
+            console.error("音乐加载失败！");
+            alert("⚠️ 无法播放音乐！\n请检查：\n1. 仓库根目录是否有 music.mp3\n2. 文件名必须完全小写\n3. 刷新页面重试");
+            setPausedState();
+        }
 
-        // 优化点：页面一加载就强制开始缓冲音频
+        // 优化点：页面加载时尝试预加载
         window.addEventListener('load', () => {
-            bgMusic.load(); // 强制浏览器读取音频元数据和缓冲
+            // 直接调用 load()，如果文件不存在会触发 audio 标签的 error 事件
+            console.log("页面加载完成，尝试预加载音乐...");
+            bgMusic.load();
         });
 
         bgMusic.addEventListener('waiting', () => { console.log("缓冲中..."); setLoadingState(); });
         bgMusic.addEventListener('playing', () => { console.log("播放中"); setPlayingState(); });
         bgMusic.addEventListener('pause', () => { setPausedState(); });
+        bgMusic.addEventListener('error', handleMusicError); // 绑定错误事件
 
         musicBtn.addEventListener('click', () => {
             if (isPlaying) {
@@ -487,7 +492,7 @@
             else navBar.classList.remove('hidden');
         }
 
-        // 保留您文件中的理由列表 (根据您上传的文件内容，未做添加)
+        // --- 理由列表 ---
         const reasons = [
             "因为你的笑容比阳光还灿烂",
             "因为你总是能包容我的小脾气",
