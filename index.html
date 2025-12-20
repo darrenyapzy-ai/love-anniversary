@@ -4,54 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我们的爱 - 一周年纪念</title>
-    <!-- 引入 Tailwind CSS 进行快速布局 -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 Google Fonts 字体 -->
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
-    <!-- 引入 FontAwesome 图标 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- 引入 Confetti 撒花特效 -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
-        /* 自定义字体设置 */
-        .font-hand {
-            font-family: 'Ma Shan Zheng', cursive;
-        }
-        .font-serif {
-            font-family: 'Noto Serif SC', serif;
-        }
+        .font-hand { font-family: 'Ma Shan Zheng', cursive; }
+        .font-serif { font-family: 'Noto Serif SC', serif; }
 
-        /* 页面切换动画 */
         .page-section {
-            display: none; /* 默认隐藏 */
+            display: none;
             animation: fadeIn 0.8s ease-in-out;
         }
-        .page-section.active {
-            display: block;
-        }
+        .page-section.active { display: block; }
 
-        /* 封面页专属样式 - 粉白色信封主题 */
-        #entrance {
-            background: linear-gradient(135deg, #fff0f5 0%, #fff 100%);
-        }
+        #entrance { background: linear-gradient(135deg, #fff0f5 0%, #fff 100%); }
 
-        /* CSS手绘信封 */
+        /* --- 放大版信封样式 Start --- */
+        /* 这里的尺寸已经调整为 360px x 240px (原 300x200) */
         .envelope-container {
             position: relative;
             cursor: pointer;
             transition: transform 0.3s;
-            width: 300px;
-            height: 200px;
-            margin: 0 auto; /* 确保自身居中 */
+            width: 360px;  /* 宽度加大 */
+            height: 240px; /* 高度加大 */
+            margin: 0 auto;
         }
-        .envelope-container:hover {
-            transform: scale(1.05);
-        }
+        .envelope-container:hover { transform: scale(1.05); }
+
         .envelope {
-            width: 300px;
-            height: 200px;
-            background-color: #ffc1cc; /* 信封主体粉色 */
+            width: 360px;  /* 宽度加大 */
+            height: 240px; /* 高度加大 */
+            background-color: #ffc1cc;
             position: relative;
             border-radius: 10px;
             box-shadow: 0 10px 25px rgba(255, 182, 193, 0.4);
@@ -60,7 +45,8 @@
             justify-content: center;
             z-index: 10;
         }
-        /* 信封盖子 */
+
+        /* 信封盖子 - 需要配合宽度调整 */
         .envelope::before {
             content: '';
             position: absolute;
@@ -68,25 +54,26 @@
             left: 0;
             width: 0;
             height: 0;
-            border-left: 150px solid transparent;
-            border-right: 150px solid transparent;
-            border-top: 100px solid #ffb7c5; /* 盖子颜色略深 */
+            /* 左右边框必须是宽度的一半 (360 / 2 = 180px) */
+            border-left: 180px solid transparent; 
+            border-right: 180px solid transparent;
+            /* 顶部边框决定盖子高度，稍微加高一点 */
+            border-top: 130px solid #ffb7c5; 
             transform-origin: top;
             transition: transform 0.5s;
             z-index: 20;
         }
-        /* 打开信封的动画 */
-        .envelope-container:hover .envelope::before {
-            transform: rotateX(180deg);
-        }
-        /* 信封上的爱心封蜡 */
+        /* --- 放大版信封样式 End --- */
+
+        .envelope-container:hover .envelope::before { transform: rotateX(180deg); }
+
         .wax-seal {
-            width: 50px;
-            height: 50px;
+            width: 60px; /* 封蜡也稍微加大 */
+            height: 60px;
             background-color: #ef4444;
             border-radius: 50%;
             position: absolute;
-            top: -25px; /* 在盖子尖端位置 */
+            top: -30px; 
             left: 50%;
             transform: translateX(-50%);
             z-index: 30;
@@ -102,33 +89,20 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 背景爱心动画 */
         .hearts-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
         }
         .heart {
-            position: absolute;
-            bottom: -100px;
-            width: 20px;
-            height: 20px;
+            position: absolute; bottom: -100px; width: 20px; height: 20px;
             background: rgba(255, 182, 193, 0.6);
             transform: rotate(45deg);
             animation: floatHeart 6s linear infinite;
         }
         .heart::before, .heart::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: rgba(255, 182, 193, 0.6);
-            border-radius: 50%;
+            content: ''; position: absolute; width: 20px; height: 20px;
+            background: rgba(255, 182, 193, 0.6); border-radius: 50%;
         }
         .heart::before { top: -10px; left: 0; }
         .heart::after { left: -10px; top: 0; }
@@ -139,61 +113,30 @@
             100% { transform: translateY(-100vh) rotate(45deg) scale(1.2); opacity: 0; }
         }
 
-        /* 音乐播放按钮旋转动画 */
-        .spin-slow {
-            animation: spin 4s linear infinite;
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        .spin-slow { animation: spin 4s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* 滚动显现动画类 */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 1s ease;
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 1s ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
 
-        /* 照片墙悬停效果 */
-        .photo-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .photo-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        }
+        .photo-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .photo-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
         
-        /* 理由切换时的淡入淡出 */
-        #reasonDisplay {
-            transition: opacity 0.3s ease;
-        }
+        #reasonDisplay { transition: opacity 0.3s ease; }
         
-        /* 兑换券样式 */
         .coupon-card {
             background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
             border: 2px dashed #fc8181;
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
         }
         .coupon-card::before, .coupon-card::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: #fef2f2; /* matches bg-red-50 */
-            border-radius: 50%;
-            top: 50%;
+            content: ''; position: absolute; width: 20px; height: 20px;
+            background-color: #fef2f2; border-radius: 50%; top: 50%;
             transform: translateY(-50%);
         }
         .coupon-card::before { left: -10px; }
         .coupon-card::after { right: -10px; }
 
-        /* 自定义光标 */
         body {
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="%23ff6b6b"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'), auto;
         }
@@ -201,26 +144,18 @@
 </head>
 <body class="bg-red-50 text-gray-800 font-serif overflow-x-hidden min-h-screen">
 
-    <!-- 漂浮爱心背景 (主页才显示) -->
     <div class="hearts-bg hidden" id="heartsContainer"></div>
 
-    <!-- 音乐控制按钮 (隐藏，直到进入主页) -->
     <div id="musicControl" class="fixed top-4 right-4 z-50 hidden opacity-0 transition-opacity duration-1000">
         <button id="musicBtn" class="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-red-500 hover:bg-red-100 transition duration-300">
-            <!-- 默认显示静音/加载状态 -->
             <i class="fas fa-music"></i>
         </button>
-        <!-- 
-            优化：
-            1. preload="auto" 
-            2. 增加了 onwaiting 和 onplaying 事件监听，控制按钮状态
-        -->
+        <!-- 优化：preload="auto" 配合 JS 的 window.onload 强制预加载 -->
         <audio id="bgMusic" loop preload="auto">
             <source src="music.mp3" type="audio/mpeg">
         </audio>
     </div>
 
-    <!-- 顶部导航栏 (返回主页) -->
     <nav id="navBar" class="fixed top-0 left-0 w-full z-40 bg-white/80 backdrop-blur-md shadow-sm py-3 px-6 hidden transition-all duration-300">
         <button onclick="navigateTo('home')" class="text-red-500 font-hand text-xl hover:text-red-700 flex items-center gap-2">
             <i class="fas fa-arrow-left"></i> 返回主页
@@ -229,23 +164,22 @@
 
     <!-- ================= 页面 0: 仪式感入口 (Entrance) ================= -->
     <div id="entrance" class="page-section active h-screen flex flex-col items-center justify-center relative overflow-hidden" onclick="enterWorld()">
-        <!-- 装饰背景 -->
         <div class="absolute w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         
-        <div class="z-10 flex flex-col items-center justify-center relative group w-full mt-32">
-            <h1 class="font-hand text-red-400 text-4xl mb-12 tracking-widest animate-pulse">To My Love</h1>
+        <!-- 增加了 mt-20，让信封稍微往下一点，不要顶得太高 -->
+        <div class="z-10 flex flex-col items-center justify-center relative group w-full mt-20">
+            <h1 class="font-hand text-red-400 text-5xl mb-16 tracking-widest animate-pulse">To My Love</h1>
             
-            <!-- 信封主体 -->
             <div class="envelope-container">
                 <div class="envelope">
                     <div class="wax-seal">
-                        <i class="fas fa-heart text-white text-xl"></i>
+                        <i class="fas fa-heart text-white text-2xl"></i>
                     </div>
-                    <span class="font-serif text-white text-lg tracking-widest">Click to Open</span>
+                    <span class="font-serif text-white text-xl tracking-widest">Click to Open</span>
                 </div>
             </div>
 
-            <p class="text-red-300 font-serif text-sm mt-12 tracking-[0.2em] uppercase opacity-70">Tap envelope to start</p>
+            <p class="text-red-300 font-serif text-base mt-16 tracking-[0.2em] uppercase opacity-70">Tap envelope to start</p>
         </div>
         
         <div class="absolute bottom-10 text-red-200 text-xs font-serif">
@@ -257,7 +191,6 @@
     <!-- ================= 页面 1: 主页 (Home) ================= -->
     <div id="home" class="page-section">
         
-        <!-- 第一屏：Hero & 计时器 -->
         <section class="min-h-screen flex flex-col items-center justify-center relative px-4 text-center">
             <div class="absolute inset-0 z-[-1]">
                 <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover opacity-20" alt="Background">
@@ -291,11 +224,9 @@
             </button>
         </section>
 
-        <!-- 第二屏：爱情时间轴 -->
         <section class="py-20 px-4 max-w-4xl mx-auto">
             <h2 class="text-center font-hand text-4xl text-red-800 mb-16 reveal">我们的故事</h2>
             <div class="relative border-l-4 border-red-200 ml-4 md:ml-0 space-y-12">
-                <!-- 事件 1 -->
                 <div class="relative pl-8 md:pl-0 reveal">
                     <div class="absolute -left-[10px] top-0 w-6 h-6 bg-red-500 rounded-full border-4 border-white shadow"></div>
                     <div class="md:flex md:justify-between items-center group">
@@ -308,7 +239,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- 事件 2 -->
                 <div class="relative pl-8 md:pl-0 reveal">
                     <div class="absolute -left-[10px] top-0 w-6 h-6 bg-red-400 rounded-full border-4 border-white shadow"></div>
                     <div class="md:flex md:justify-between items-center flex-row-reverse group">
@@ -326,7 +256,6 @@
             </div>
         </section>
 
-        <!-- 第三屏：照片墙 -->
         <section class="py-20 bg-white">
             <div class="max-w-6xl mx-auto px-4">
                 <h2 class="text-center font-hand text-4xl text-red-800 mb-12 reveal">甜蜜瞬间</h2>
@@ -344,10 +273,9 @@
             </div>
         </section>
 
-        <!-- 第四屏：爱你的100个理由 -->
         <section class="py-20 bg-red-50">
             <div class="max-w-4xl mx-auto px-4 text-center">
-                <h2 class="text-center font-hand text-4xl text-red-800 mb-12 reveal">爱你的100个理由</h2>
+                <h2 class="text-center font-hand text-4xl text-red-800 mb-12 reveal">爱你的理由</h2>
                 <div class="bg-white p-10 rounded-3xl shadow-xl relative transform transition duration-500 hover:scale-[1.02] border-2 border-red-100 reveal">
                     <i class="fas fa-quote-left text-5xl text-red-100 absolute top-6 left-6"></i>
                     <div class="min-h-[120px] flex items-center justify-center py-6 px-8">
@@ -363,7 +291,6 @@
             </div>
         </section>
 
-        <!-- 第五屏：给你的信 -->
         <section class="py-20 px-4">
             <div class="max-w-2xl mx-auto bg-white p-8 md:p-12 rounded-lg shadow-2xl border border-red-100 relative reveal">
                 <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full bg-red-400 border-2 border-white shadow-md"></div>
@@ -373,19 +300,16 @@
             </div>
         </section>
 
-        <!-- 更多功能入口 (导航区) -->
         <section class="py-20 bg-white">
             <div class="max-w-5xl mx-auto px-4">
                 <h2 class="text-center font-hand text-4xl text-red-800 mb-12">更多惊喜</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- 入口 1 -->
                     <div onclick="navigateTo('coupons')" class="cursor-pointer group relative overflow-hidden rounded-2xl shadow-lg h-64 bg-gradient-to-br from-pink-100 to-red-100 flex flex-col items-center justify-center text-center transition-transform hover:-translate-y-2">
                         <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition duration-300"></div>
                         <i class="fas fa-ticket-alt text-6xl text-red-400 mb-4 group-hover:scale-110 transition duration-300"></i>
                         <h3 class="font-hand text-3xl text-gray-800">恋爱兑换券</h3>
                         <p class="mt-2 text-gray-600">专属特权，点击领取</p>
                     </div>
-                    <!-- 入口 2 -->
                     <div onclick="navigateTo('footprints')" class="cursor-pointer group relative overflow-hidden rounded-2xl shadow-lg h-64 bg-gradient-to-br from-blue-100 to-indigo-100 flex flex-col items-center justify-center text-center transition-transform hover:-translate-y-2">
                         <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition duration-300"></div>
                         <i class="fas fa-map-marked-alt text-6xl text-indigo-400 mb-4 group-hover:scale-110 transition duration-300"></i>
@@ -401,14 +325,12 @@
         </footer>
     </div>
 
-    <!-- ================= 页面 2: 恋爱兑换券 (Coupons) ================= -->
     <div id="coupons" class="page-section min-h-screen bg-red-50 py-20 px-4">
         <div class="max-w-4xl mx-auto">
             <h2 class="text-center font-hand text-5xl text-red-800 mb-4">恋爱特权券</h2>
             <p class="text-center text-gray-500 mb-12">最终解释权归我所有 (大概吧😝)</p>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- 券 1 -->
                 <div class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition">
                     <div class="flex-1">
                         <h3 class="font-bold text-2xl text-red-500 mb-2">按摩券</h3>
@@ -420,7 +342,6 @@
                         <button class="px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600">使用</button>
                     </div>
                 </div>
-                 <!-- 券 2 -->
                 <div class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition">
                     <div class="flex-1">
                         <h3 class="font-bold text-2xl text-red-500 mb-2">消气券</h3>
@@ -432,7 +353,6 @@
                         <button class="px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600">使用</button>
                     </div>
                 </div>
-                 <!-- 券 3 -->
                 <div class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition">
                     <div class="flex-1">
                         <h3 class="font-bold text-2xl text-red-500 mb-2">清空购物车</h3>
@@ -444,7 +364,6 @@
                         <button class="px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600">使用</button>
                     </div>
                 </div>
-                <!-- 券 4 -->
                 <div class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition">
                     <div class="flex-1">
                         <h3 class="font-bold text-2xl text-red-500 mb-2">大餐券</h3>
@@ -464,15 +383,12 @@
         </div>
     </div>
 
-    <!-- ================= 页面 3: 我们的足迹 (Footprints - 已更新) ================= -->
     <div id="footprints" class="page-section min-h-screen bg-indigo-50 py-20 px-4">
         <div class="max-w-3xl mx-auto text-center">
             <h2 class="font-hand text-5xl text-indigo-800 mb-4">一起走过的路</h2>
             <p class="text-gray-500 mb-12">世界很大，幸好有你陪我看</p>
             
-            <!-- 这里用一个简单的列表代替地图，你可以放地图截图 -->
             <div class="space-y-6">
-                <!-- Melaka 机场街 -->
                 <div class="bg-white p-6 rounded-xl shadow-lg flex items-center gap-4 transform hover:scale-105 transition">
                     <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-2xl">🏮</div>
                     <div class="text-left">
@@ -481,7 +397,6 @@
                     </div>
                 </div>
                 
-                <!-- Port Dickson 看日出 -->
                 <div class="bg-white p-6 rounded-xl shadow-lg flex items-center gap-4 transform hover:scale-105 transition">
                     <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center text-2xl">🌅</div>
                     <div class="text-left">
@@ -502,113 +417,77 @@
     </div>
 
     <script>
-        // --- 1. 音乐控制 & 状态逻辑 ---
         const musicBtn = document.getElementById('musicBtn');
         const bgMusic = document.getElementById('bgMusic');
         let isPlaying = false;
 
-        // 设置 "加载中" 状态的函数
         function setLoadingState() {
-            musicBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; // 显示旋转的加载图标
+            musicBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; 
             musicBtn.classList.remove('spin-slow');
         }
-
-        // 设置 "播放中" 状态的函数
         function setPlayingState() {
             musicBtn.innerHTML = '<i class="fas fa-pause"></i>';
             musicBtn.classList.add('spin-slow');
             isPlaying = true;
         }
-
-        // 设置 "暂停" 状态的函数
         function setPausedState() {
             musicBtn.innerHTML = '<i class="fas fa-music"></i>';
             musicBtn.classList.remove('spin-slow');
             isPlaying = false;
         }
 
-        // 监听音频缓冲事件 (当由于缺乏数据而暂停时触发)
-        bgMusic.addEventListener('waiting', () => {
-            console.log("音频正在缓冲...");
-            setLoadingState();
+        // 优化点：页面一加载就强制开始缓冲音频
+        window.addEventListener('load', () => {
+            bgMusic.load(); // 强制浏览器读取音频元数据和缓冲
         });
 
-        // 监听音频可以播放事件
-        bgMusic.addEventListener('playing', () => {
-            console.log("音频开始播放");
-            setPlayingState();
-        });
-        
-        // 监听音频暂停
-        bgMusic.addEventListener('pause', () => {
-            setPausedState();
-        });
+        bgMusic.addEventListener('waiting', () => { console.log("缓冲中..."); setLoadingState(); });
+        bgMusic.addEventListener('playing', () => { console.log("播放中"); setPlayingState(); });
+        bgMusic.addEventListener('pause', () => { setPausedState(); });
 
-        // 音乐按钮点击事件
         musicBtn.addEventListener('click', () => {
             if (isPlaying) {
                 bgMusic.pause();
             } else {
-                setLoadingState(); // 点击后立即显示加载
+                setLoadingState();
                 bgMusic.play().catch(e => {
-                    console.log("播放失败:", e);
-                    setPausedState(); // 如果失败，恢复图标
+                    console.log("播放失败", e);
+                    setPausedState();
                 });
             }
         });
 
-        // --- 2. 核心逻辑：从入口进入世界 ---
         function enterWorld() {
-            // 隐藏入口
             document.getElementById('entrance').style.display = 'none';
-            // 显示主页
             document.getElementById('home').classList.add('active');
             
-            // 显示音乐控制和背景爱心
             document.getElementById('musicControl').classList.remove('hidden');
-            setTimeout(() => {
-                document.getElementById('musicControl').classList.remove('opacity-0');
-            }, 100);
+            setTimeout(() => { document.getElementById('musicControl').classList.remove('opacity-0'); }, 100);
             document.getElementById('heartsContainer').classList.remove('hidden');
 
-            // 尝试自动播放音乐
-            setLoadingState(); // 立即显示加载状态，给用户反馈
+            setLoadingState();
             bgMusic.volume = 0.2; 
             
             bgMusic.play().then(() => {
-                // 如果缓冲够快，会直接进入 playing 事件，这里不需要额外操作
+                // Autoplay started
             }).catch(e => {
-                console.log("自动播放被阻止或出错:", e);
-                // 此时图标仍是 Loading 或 静音，用户可以手动点击
+                console.log("自动播放被拦截，等待用户点击:", e);
                 setPausedState(); 
             });
 
-            // 来一波开场庆祝撒花
             triggerConfetti();
         }
 
-        // --- 3. 页面导航逻辑 ---
         function navigateTo(pageId) {
-            // 隐藏所有页面
-            document.querySelectorAll('.page-section').forEach(el => {
-                el.classList.remove('active');
-            });
-            // 显示目标页面
+            document.querySelectorAll('.page-section').forEach(el => { el.classList.remove('active'); });
             document.getElementById(pageId).classList.add('active');
-            
-            // 滚动到顶部
             window.scrollTo(0, 0);
-
-            // 控制顶部导航栏显示 (主页不显示返回按钮)
             const navBar = document.getElementById('navBar');
-            if (pageId === 'home') {
-                navBar.classList.add('hidden');
-            } else {
-                navBar.classList.remove('hidden');
-            }
+            if (pageId === 'home') navBar.classList.add('hidden');
+            else navBar.classList.remove('hidden');
         }
 
-        // --- 4. 100个理由全集 ---
+        // 保留您文件中的理由列表 (根据您上传的文件内容，未做添加)
         const reasons = [
             "因为你的笑容比阳光还灿烂",
             "因为你总是能包容我的小脾气",
@@ -689,13 +568,11 @@
             "因为每天多爱你一点"
         ];
 
-        // --- 5. 配置区域 ---
         const config = {
             startDate: "2025-04-14T00:00:00", 
             loveLetter: "亲爱的，\n不知不觉我们已经走过了一年。\n感谢你包容我的小脾气，\n感谢你带来的所有温暖。\n未来的日子很长，\n但我只想和你一起慢慢变老。\n一周年快乐！❤️"
         };
 
-        // --- 6. 随机理由显示 ---
         function displayNextReason() {
             const display = document.getElementById('reasonDisplay');
             const randomReason = reasons[Math.floor(Math.random() * reasons.length)];
@@ -704,39 +581,22 @@
                 display.innerText = randomReason;
                 display.style.opacity = 1;
             }, 300);
-            confetti({
-                particleCount: 30,
-                spread: 50,
-                origin: { y: 0.8 },
-                colors: ['#ffb6c1', '#ff69b4']
-            });
+            confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 }, colors: ['#ffb6c1', '#ff69b4'] });
         }
 
-        // --- 7. 计时器逻辑 ---
         function updateTimer() {
             const start = new Date(config.startDate).getTime();
             const now = new Date().getTime();
             const diff = now - start;
-
-            if (diff < 0) {
-                document.getElementById("days").innerText = "0";
-                return;
-            }
-
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-            document.getElementById("days").innerText = days;
-            document.getElementById("hours").innerText = hours;
-            document.getElementById("minutes").innerText = minutes;
-            document.getElementById("seconds").innerText = seconds;
+            if (diff < 0) { document.getElementById("days").innerText = "0"; return; }
+            document.getElementById("days").innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById("hours").innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            document.getElementById("minutes").innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById("seconds").innerText = Math.floor((diff % (1000 * 60)) / 1000);
         }
         setInterval(updateTimer, 1000);
         updateTimer();
 
-        // --- 8. 打字机效果 ---
         const letterElem = document.getElementById("typewriter");
         let charIndex = 0;
         function typeWriter() {
@@ -748,27 +608,16 @@
             }
         }
         const letterObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    typeWriter();
-                    letterObserver.disconnect();
-                }
-            });
+            entries.forEach(entry => { if (entry.isIntersecting) { typeWriter(); letterObserver.disconnect(); } });
         });
         letterObserver.observe(letterElem);
 
-        // --- 9. 滚动显现动画 ---
         const revealElements = document.querySelectorAll('.reveal');
         const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
-            });
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
         }, { threshold: 0.1 });
         revealElements.forEach(el => revealObserver.observe(el));
 
-        // --- 10. 撒花特效 ---
         function triggerConfetti() {
             const duration = 3000;
             const end = Date.now() + duration;
@@ -779,7 +628,6 @@
             }());
         }
 
-        // --- 11. 背景爱心 ---
         function createHearts() {
             const container = document.getElementById('heartsContainer');
             for (let i = 0; i < 15; i++) {
