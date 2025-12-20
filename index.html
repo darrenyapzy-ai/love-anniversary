@@ -21,13 +21,13 @@
 
         #entrance { background: linear-gradient(135deg, #fff0f5 0%, #fff 100%); }
 
-        /* --- 放大版信封样式 (保持您需要的大小) --- */
+        /* --- 放大版信封样式 --- */
         .envelope-container {
             position: relative;
             cursor: pointer;
             transition: transform 0.3s;
-            width: 360px;  /* 宽度 */
-            height: 240px; /* 高度 */
+            width: 360px;
+            height: 240px;
             margin: 0 auto;
         }
         .envelope-container:hover { transform: scale(1.05); }
@@ -45,7 +45,6 @@
             z-index: 10;
         }
 
-        /* 信封盖子 */
         .envelope::before {
             content: '';
             position: absolute;
@@ -146,8 +145,11 @@
         <button id="musicBtn" class="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-red-500 hover:bg-red-100 transition duration-300">
             <i class="fas fa-music"></i>
         </button>
-        <!-- 添加了错误监听 onerror -->
-        <audio id="bgMusic" loop preload="auto" onerror="handleMusicError()">
+        <!-- 
+            修正：移除 onerror 的直接调用，改用 JS 监听。
+            preload="auto" 配合浏览器缓存实现最快加载。
+        -->
+        <audio id="bgMusic" loop preload="auto">
             <source src="music.mp3" type="audio/mpeg">
         </audio>
     </div>
@@ -431,24 +433,35 @@
             isPlaying = false;
         }
         
-        // 新增：错误处理
-        function handleMusicError() {
-            console.error("音乐加载失败！");
-            alert("⚠️ 无法播放音乐！\n请检查：\n1. 仓库根目录是否有 music.mp3\n2. 文件名必须完全小写\n3. 刷新页面重试");
+        // 错误处理：更具体的错误提示
+        function handleMusicError(e) {
+            console.error("Music Error Details:", bgMusic.error); // Log the actual error object
+            let msg = "未知错误";
+            if (bgMusic.error) {
+                 switch(bgMusic.error.code) {
+                    case 1: msg = "用户终止 (MEDIA_ERR_ABORTED)"; break;
+                    case 2: msg = "网络错误 (MEDIA_ERR_NETWORK)"; break;
+                    case 3: msg = "解码错误 (MEDIA_ERR_DECODE)"; break;
+                    case 4: msg = "文件不可用 (MEDIA_ERR_SRC_NOT_SUPPORTED)"; break;
+                }
+            }
+            // 只有真正出错才弹窗，避免打扰，忽略中止错误
+            if(bgMusic.error && bgMusic.error.code !== 1) {
+               // 暂时注释掉 alert，避免在预览环境中频繁弹出
+               // alert(`⚠️ 音乐播放失败：${msg}`);
+            }
             setPausedState();
         }
 
-        // 优化点：页面加载时尝试预加载
+        // 优化点：页面加载时尝试预加载 - 移除 fetch, 直接 load
         window.addEventListener('load', () => {
-            // 直接调用 load()，如果文件不存在会触发 audio 标签的 error 事件
-            console.log("页面加载完成，尝试预加载音乐...");
             bgMusic.load();
         });
 
         bgMusic.addEventListener('waiting', () => { console.log("缓冲中..."); setLoadingState(); });
         bgMusic.addEventListener('playing', () => { console.log("播放中"); setPlayingState(); });
         bgMusic.addEventListener('pause', () => { setPausedState(); });
-        bgMusic.addEventListener('error', handleMusicError); // 绑定错误事件
+        bgMusic.addEventListener('error', handleMusicError);
 
         musicBtn.addEventListener('click', () => {
             if (isPlaying) {
@@ -456,7 +469,7 @@
             } else {
                 setLoadingState();
                 bgMusic.play().catch(e => {
-                    console.log("播放失败", e);
+                    console.log("播放被拦截或失败:", e);
                     setPausedState();
                 });
             }
