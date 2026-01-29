@@ -365,19 +365,31 @@
         <section class="py-20 bg-white">
             <div class="max-w-5xl mx-auto px-4">
                 <h2 class="text-center font-hand text-4xl text-red-800 mb-12">更多惊喜</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- 修改 grid 为 3 列 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- 恋爱兑换券 -->
                     <div onclick="navigateTo('coupons')" class="cursor-pointer group relative overflow-hidden rounded-2xl shadow-lg h-64 bg-gradient-to-br from-pink-100 to-red-100 flex flex-col items-center justify-center text-center transition-transform hover:-translate-y-2">
                         <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition duration-300"></div>
                         <i class="fas fa-ticket-alt text-6xl text-red-400 mb-4 group-hover:scale-110 transition duration-300"></i>
                         <h3 class="font-hand text-3xl text-gray-800">恋爱兑换券</h3>
                         <p class="mt-2 text-gray-600">专属特权，点击领取</p>
                     </div>
+
+                    <!-- 我们的足迹 -->
                     <div onclick="navigateTo('footprints')" class="cursor-pointer group relative overflow-hidden rounded-2xl shadow-lg h-64 bg-gradient-to-br from-blue-100 to-indigo-100 flex flex-col items-center justify-center text-center transition-transform hover:-translate-y-2">
                         <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition duration-300"></div>
                         <i class="fas fa-map-marked-alt text-6xl text-indigo-400 mb-4 group-hover:scale-110 transition duration-300"></i>
                         <h3 class="font-hand text-3xl text-gray-800">我们的足迹</h3>
                         <p class="mt-2 text-gray-600">去过的每一个地方</p>
                     </div>
+
+                    <!-- 新增：默契挑战 (跳转新网页) -->
+                    <a href="love_quiz.html" class="block cursor-pointer group relative overflow-hidden rounded-2xl shadow-lg h-64 bg-gradient-to-br from-yellow-100 to-orange-100 flex flex-col items-center justify-center text-center transition-transform hover:-translate-y-2">
+                        <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition duration-300"></div>
+                        <i class="fas fa-puzzle-piece text-6xl text-orange-400 mb-4 group-hover:scale-110 transition duration-300"></i>
+                        <h3 class="font-hand text-3xl text-gray-800">默契大考验</h3>
+                        <p class="mt-2 text-gray-600">看看我们有多懂彼此？</p>
+                    </a>
                 </div>
             </div>
         </section>
@@ -763,36 +775,30 @@
 
         // --- 未来约定列表 ---
         const futurePromises = [
-            "我们将一起去冰岛看极光，在欧若拉下许愿",
-            "我们会一起养一只叫'年糕'的小猫，看它在阳光下打滚",
-            "我们将一起去迪士尼看烟花，在城堡前拥抱",
-            "我们会一起把家装修成温暖的奶油风",
+            "我们将一起去日本看樱花，学一下动漫里的样子",
+            "我们会一起养一只叫像Mochi一样好的小猫，然后给它取名Mocha",
+            "我们将一起去迪士尼看烟花，在城堡前抱抱",
+            "我们会一起把家装修成温暖又舒服的样子（还要有电竞房哦）",
             "我们将每年拍一张同样的合影，直到白头偕老",
-            "我们会一起学会做一道复杂的法式甜点",
-            "我们将一起去听一场周杰伦的演唱会，大声合唱",
-            "我们会一起去海边买一所房子，面朝大海春暖花开",
-            "我们将一起完成一次没有目的地的公路旅行",
+            "我们会一起学会做一道复杂的甜点",
             "我们会等到八十岁，还要手牵手去公园散步",
-            "我们将一起去探索海底世界，考潜水证",
             "我们会在属于我们的小窝里，一起窝在沙发看投影电影",
             "我们将手牵手漫步在异国的街头，假装是当地人",
             "我们会一起做一本只属于我们的回忆相册",
-            "我们将一起去坐热气球，俯瞰这个世界",
             "我们会学会做对方最爱吃的一道菜",
-            "我们将领养一只流浪小动物，给它一个温暖的家",
+            "我们再领养一只流浪小猫，给它一个温暖的家",
             "我们会一起去露营，数天上的星星",
-            "我们将存钱去一次南极/北极",
+            "我们将存钱去一次外国",
             "我们会在每个结婚纪念日都重温一次第一次约会",
             "我们将一起种一棵树，看着它和我们的爱情一起长大",
-            "我们会一起去跳伞/蹦极，体验心跳加速的感觉",
-            "我们将一起逛宜家，为家里添置可爱的小物件",
+            "我们将一起逛ikea，为家里添置可爱的小物件",
             "我们会一起去滑雪，在雪地里打滚",
             "我们将一起看遍世间所有的日出和日落"
         ];
 
         const config = {
             startDate: "2025-04-14T00:00:00", 
-            loveLetter: "亲爱的，\n不知不觉我们已经走过了一年。\n感谢你包容我的小脾气，\n感谢你带来的所有温暖。\n未来的日子很长，\n但我只想和你一起慢慢变老。\n一周年快乐！❤️"
+            loveLetter: "宝贝，\n不知不觉我们已经走过了一年。\n感谢你包容我的小脾气，\n感谢你带来的所有温暖。\n未来的日子很长，\n但我只想和你一起慢慢变老。\n一周年快乐！爱你❤️"
         };
 
         function displayNextReason() {
