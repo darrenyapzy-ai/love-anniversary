@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>默契大考验 - 我们的爱</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        .font-hand { font-family: 'Ma Shan Zheng', cursive; }
+        .font-serif { font-family: 'Noto Serif SC', serif; }
+        
+        .option-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-btn:active {
+            transform: scale(0.95);
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .float-anim { animation: float 3s ease-in-out infinite; }
+
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 隐藏滚动条 */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="bg-orange-50 min-h-screen flex flex-col items-center justify-center font-serif text-gray-800 relative overflow-hidden">
+
+    <!-- 背景装饰 -->
+    <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+        <i class="fas fa-heart text-red-300 absolute top-10 left-10 text-4xl animate-pulse"></i>
+        <i class="fas fa-question text-orange-300 absolute bottom-20 right-10 text-6xl rotate-12"></i>
+        <div class="absolute w-64 h-64 bg-yellow-200 rounded-full blur-3xl -top-20 -right-20"></div>
+        <div class="absolute w-64 h-64 bg-pink-200 rounded-full blur-3xl bottom-0 left-0"></div>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 w-full z-40 py-4 px-6 flex justify-between items-center">
+        <a href="我们的爱一周年.html" class="text-orange-500 font-hand text-xl hover:text-orange-700 flex items-center gap-2 bg-white/50 backdrop-blur px-4 py-2 rounded-full shadow-sm">
+            <i class="fas fa-arrow-left"></i> 返回主页
+        </a>
+    </nav>
+
+    <!-- 问答容器 -->
+    <div class="w-full max-w-lg px-6 z-10 relative">
+        
+        <!-- 欢迎页 -->
+        <div id="start-screen" class="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-8 text-center border-2 border-white">
+            <div class="mb-6 inline-block p-4 bg-orange-100 rounded-full text-orange-500 text-4xl float-anim">
+                <i class="fas fa-gamepad"></i>
+            </div>
+            <h1 class="font-hand text-4xl mb-4 text-gray-800">默契大考验</h1>
+            <p class="text-gray-600 mb-8 leading-loose">这里有5个关于我们的问题<br>有些答案显而易见，有些...<br>你准备好了吗？</p>
+            <button onclick="startQuiz()" class="w-full bg-gradient-to-r from-orange-400 to-red-400 text-white font-bold py-4 rounded-xl text-xl shadow-lg hover:shadow-orange-300/50 hover:scale-[1.02] transition">
+                开始挑战 💪
+            </button>
+        </div>
+
+        <!-- 答题页 -->
+        <div id="quiz-screen" class="hidden">
+            <!-- 进度条 -->
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-8 overflow-hidden">
+                <div id="progress-bar" class="bg-orange-400 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl p-8 border-2 border-orange-50 min-h-[400px] flex flex-col justify-center">
+                <div class="text-center mb-8">
+                    <span class="text-orange-400 text-sm font-bold tracking-widest uppercase mb-2 block">Question <span id="current-q-num">1</span>/5</span>
+                    <h2 id="question-text" class="font-hand text-3xl text-gray-800 leading-snug">题目加载中...</h2>
+                </div>
+                
+                <div id="options-container" class="space-y-4">
+                    <!-- 选项按钮将通过 JS 插入 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果页 -->
+        <div id="result-screen" class="hidden text-center">
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-10 border-4 border-red-100 transform scale-100 transition-all duration-500">
+                <div class="mb-6">
+                    <i class="fas fa-heart text-6xl text-red-500 animate-bounce"></i>
+                </div>
+                
+                <h2 class="font-hand text-4xl text-gray-800 mb-6">挑战结束</h2>
+                
+                <div class="my-8 p-6 bg-red-50 rounded-xl border border-red-100">
+                    <p class="font-serif text-xl leading-relaxed text-gray-700">
+                        不管你刚刚选了什么...<br>
+                        <span class="font-bold text-red-500 text-2xl mt-2 block">“正确答案其实都是你”</span>
+                    </p>
+                </div>
+
+                <p class="text-gray-500 text-sm mb-8">（其实这根本不是考试，是在想你 ❤️）</p>
+
+                <div class="space-y-3">
+                    <button onclick="confettiEffect()" class="w-full bg-red-500 text-white py-3 rounded-xl hover:bg-red-600 transition shadow-md">
+                        再庆祝一次 🎉
+                    </button>
+                    <a href="我们的爱一周年.html" class="block w-full border-2 border-red-200 text-red-400 py-3 rounded-xl hover:bg-red-50 transition">
+                        回到我们的主页
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "我最喜欢你的什么样子",
+                options: ["你化好看的妆的时候", "你对我笑的时候", "你睡觉的样子"]
+            },
+            {
+                question: "我们最喜欢一起干什么",
+                options: ["打游戏", "看电影", "逛街"]
+            },
+            {
+                question: "如果我们现在马上出发，你想去哪？",
+                options: ["看海", "露营", "出国"]
+            },
+            {
+                question: "你觉得我们谁更爱谁？",
+                options: ["肯定是都不想输", "你爱我多一点", "平局（都很爱）"]
+            },
+            {
+                question: "现在这一刻，你最想做什么？",
+                options: ["抱抱我", "亲亲我", "想我"]
+            }
+        ];
+
+        let currentQ = 0;
+
+        function startQuiz() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            document.getElementById('quiz-screen').classList.add('fade-in');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQ];
+            document.getElementById('current-q-num').innerText = currentQ + 1;
+            document.getElementById('question-text').innerText = q.question;
+            
+            // 更新进度条
+            const progress = ((currentQ) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = ''; // 清空旧选项
+
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn w-full bg-white border-2 border-orange-100 text-gray-700 py-4 px-6 rounded-xl text-left hover:bg-orange-50 hover:border-orange-300 transition shadow-sm flex items-center group";
+                btn.innerHTML = `
+                    <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center mr-4 text-sm font-bold group-hover:bg-orange-500 group-hover:text-white transition">${String.fromCharCode(65 + index)}</span>
+                    <span class="text-lg">${opt}</span>
+                `;
+                btn.onclick = () => handleAnswer();
+                container.appendChild(btn);
+            });
+        }
+
+        function handleAnswer() {
+            // 简单的过渡动画
+            const container = document.getElementById('quiz-screen');
+            container.style.opacity = '0';
+            
+            setTimeout(() => {
+                currentQ++;
+                if (currentQ < questions.length) {
+                    loadQuestion();
+                    container.style.opacity = '1';
+                } else {
+                    showResult();
+                }
+            }, 300);
+        }
+
+        function showResult() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            const resultScreen = document.getElementById('result-screen');
+            resultScreen.classList.remove('hidden');
+            resultScreen.classList.add('fade-in');
+            
+            confettiEffect();
+        }
+
+        function confettiEffect() {
+            const count = 200;
+            const defaults = { origin: { y: 0.7 } };
+
+            function fire(particleRatio, opts) {
+                confetti(Object.assign({}, defaults, opts, {
+                    particleCount: Math.floor(count * particleRatio)
+                }));
+            }
+
+            fire(0.25, { spread: 26, startVelocity: 55, colors: ['#ff0000', '#ffa500'] });
+            fire(0.2, { spread: 60, colors: ['#ff0000', '#ffa500'] });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8, colors: ['#ff0000', '#ffa500'] });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2, colors: ['#ff0000', '#ffa500'] });
+            fire(0.1, { spread: 120, startVelocity: 45, colors: ['#ff0000', '#ffa500'] });
+        }
+    </script>
+</body>
+</html>
