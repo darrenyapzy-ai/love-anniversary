@@ -117,12 +117,13 @@
         .photo-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .photo-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
         
-        #reasonDisplay { transition: opacity 0.3s ease; }
+        #reasonDisplay, #promiseDisplay { transition: opacity 0.3s ease; }
         
         .coupon-card {
             background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
             border: 2px dashed #fc8181;
             position: relative; overflow: hidden;
+            transition: all 0.3s ease;
         }
         .coupon-card::before, .coupon-card::after {
             content: ''; position: absolute; width: 20px; height: 20px;
@@ -131,6 +132,47 @@
         }
         .coupon-card::before { left: -10px; }
         .coupon-card::after { right: -10px; }
+
+        /* 已使用状态样式 */
+        .coupon-card.used {
+            filter: grayscale(100%);
+            opacity: 0.7;
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+        .coupon-card.used::before, .coupon-card.used::after {
+            background-color: #fef2f2; /* 保持背景色一致，避免圆孔突兀 */
+        }
+        
+        /* 印章样式 */
+        .stamp {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            border: 3px solid #ef4444;
+            color: #ef4444;
+            font-size: 2rem;
+            font-weight: bold;
+            padding: 5px 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            pointer-events: none;
+            z-index: 10;
+            border-radius: 8px;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+        .coupon-card.used .stamp {
+            display: block;
+            animation: stampIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes stampIn {
+            0% { transform: translate(-50%, -50%) scale(2) rotate(-15deg); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(-15deg); opacity: 0.8; }
+        }
 
         body {
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="%23ff6b6b"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'), auto;
@@ -145,9 +187,6 @@
         <button id="musicBtn" class="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-red-500 hover:bg-red-100 transition duration-300">
             <i class="fas fa-music"></i>
         </button>
-        <!-- 
-            Github 上传提示：确保 music.mp3 文件也在同一个根目录下。
-        -->
         <audio id="bgMusic" loop preload="auto">
             <source src="music.mp3" type="audio/mpeg">
         </audio>
@@ -189,7 +228,6 @@
         
         <section class="min-h-screen flex flex-col items-center justify-center relative px-4 text-center">
             <div class="absolute inset-0 z-[-1]">
-                <!-- 背景图也可以替换为本地图片，例如 src="bg.jpg" -->
                 <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover opacity-20" alt="Background">
                 <div class="absolute inset-0 bg-gradient-to-b from-transparent via-red-50/50 to-red-50"></div>
             </div>
@@ -253,30 +291,24 @@
             </div>
         </section>
 
-        <!-- 
-            Github 图片替换区域
-            请确保将 love1.jpg, love2.jpg, love3.jpg 上传到与此 html 文件相同的文件夹中
-        -->
         <section class="py-20 bg-white">
             <div class="max-w-6xl mx-auto px-4">
                 <h2 class="text-center font-hand text-4xl text-red-800 mb-12 reveal">甜蜜瞬间</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="relative h-80 rounded-2xl overflow-hidden group reveal photo-card">
-                        <!-- 替换为 love1.jpg -->
-                        <img src="love1.jpeg" onerror="this.src='https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=1974&auto=format&fit=crop'; console.log('Image love1.jpg not found, using fallback.');" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="Sweet Moment 1">
+                        <img src="love1.jpeg" onerror="this.src='https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=1974&auto=format&fit=crop'" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="Sweet Moment 1">
                     </div>
                     <div class="relative h-80 rounded-2xl overflow-hidden group reveal photo-card">
-                        <!-- 替换为 love2.jpg -->
-                        <img src="love2.jpeg" onerror="this.src='https://images.unsplash.com/photo-1621091211034-53136cc1eb32?q=80&w=1974&auto=format&fit=crop'; console.log('Image love2.jpg not found, using fallback.');" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="Sweet Moment 2">
+                        <img src="love2.jpeg" onerror="this.src='https://images.unsplash.com/photo-1621091211034-53136cc1eb32?q=80&w=1974&auto=format&fit=crop'" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="Sweet Moment 2">
                     </div>
                     <div class="relative h-80 rounded-2xl overflow-hidden group reveal photo-card">
-                        <!-- 替换为 love3.jpg -->
-                        <img src="love3.jpeg" onerror="this.src='https://images.unsplash.com/photo-1516054575922-f0b8eeadec1a?q=80&w=1974&auto=format&fit=crop'; console.log('Image love3.jpg not found, using fallback.');" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="Sweet Moment 3">
+                        <img src="love3.jpeg" onerror="this.src='https://images.unsplash.com/photo-1516054575922-f0b8eeadec1a?q=80&w=1974&auto=format&fit=crop'" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="Sweet Moment 3">
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- 爱你的理由 -->
         <section class="py-20 bg-red-50">
             <div class="max-w-4xl mx-auto px-4 text-center">
                 <h2 class="text-center font-hand text-4xl text-red-800 mb-12 reveal">爱你的理由</h2>
@@ -291,6 +323,32 @@
                 </div>
                 <button onclick="displayNextReason()" class="mt-10 px-10 py-4 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full hover:from-red-600 hover:to-pink-600 transition shadow-lg font-hand text-2xl animate-pulse">
                     随机抽取一条理由
+                </button>
+            </div>
+        </section>
+
+        <!-- 未来约定抽卡 -->
+        <section class="py-20 bg-indigo-50 relative overflow-hidden">
+            <!-- 装饰背景 -->
+            <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+                <div class="absolute top-10 left-10 text-6xl text-indigo-300 transform -rotate-12"><i class="fas fa-plane"></i></div>
+                <div class="absolute bottom-20 right-20 text-6xl text-purple-300 transform rotate-12"><i class="fas fa-camera-retro"></i></div>
+            </div>
+
+            <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+                <h2 class="text-center font-hand text-4xl text-indigo-800 mb-12 reveal">未来的约定</h2>
+                <div class="bg-white p-10 rounded-3xl shadow-xl relative transform transition duration-500 hover:scale-[1.02] border-2 border-indigo-100 reveal">
+                    <i class="fas fa-star text-4xl text-indigo-200 absolute top-6 left-6 animate-pulse"></i>
+                    <i class="fas fa-moon text-4xl text-purple-200 absolute bottom-6 right-6"></i>
+                    
+                    <div class="min-h-[120px] flex items-center justify-center py-6 px-8">
+                        <p id="promiseDisplay" class="font-serif text-2xl md:text-3xl text-gray-800 leading-relaxed font-bold">
+                            我们的未来会去哪里？点击抽取 👇
+                        </p>
+                    </div>
+                </div>
+                <button onclick="displayNextPromise()" class="mt-10 px-10 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full hover:from-indigo-600 hover:to-purple-600 transition shadow-lg font-hand text-2xl hover:shadow-indigo-300/50">
+                    ✨ 许下一个未来约定
                 </button>
             </div>
         </section>
@@ -329,56 +387,70 @@
         </footer>
     </div>
 
+    <!-- 兑换券页面 -->
     <div id="coupons" class="page-section min-h-screen bg-red-50 py-20 px-4">
         <div class="max-w-4xl mx-auto">
             <h2 class="text-center font-hand text-5xl text-red-800 mb-4">恋爱特权券</h2>
-            <p class="text-center text-gray-500 mb-12">最终解释权归我所有 (大概吧😝)</p>
+            <p class="text-center text-gray-500 mb-12">谨慎使用，每一张都代表我对你的承诺 ❤️</p>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="couponList">
+                
+                <!-- 按摩券 -->
+                <div id="coupon-massage" class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition relative group">
+                    <div class="stamp">已核销 CERTIFIED</div>
                     <div class="flex-1">
                         <h3 class="font-bold text-2xl text-red-500 mb-2">按摩券</h3>
                         <p class="text-gray-500 text-sm">凭此券可享受全套按摩服务30分钟</p>
-                        <p class="text-xs text-gray-400 mt-2">有效期：永久有效</p>
+                        <p class="text-xs text-gray-400 mt-2"><i class="fas fa-history mr-1"></i>本年度限用 1 次</p>
                     </div>
                     <div class="border-l-2 border-dashed border-red-200 pl-4 flex flex-col items-center justify-center">
-                        <i class="fas fa-hand-sparkles text-3xl text-red-300 mb-2"></i>
-                        <button class="px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600">使用</button>
+                        <i class="fas fa-hand-sparkles text-3xl text-red-300 mb-2 group-hover:text-red-500 transition"></i>
+                        <button onclick="tryRedeem('massage', '按摩券')" class="coupon-btn px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600 transition shadow-md">点击使用</button>
                     </div>
                 </div>
-                <div class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition">
+
+                <!-- 消气券 -->
+                <div id="coupon-forgive" class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition relative group">
+                    <div class="stamp">已核销 CERTIFIED</div>
                     <div class="flex-1">
                         <h3 class="font-bold text-2xl text-red-500 mb-2">消气券</h3>
                         <p class="text-gray-500 text-sm">吵架时出示，无条件和好，不能生气</p>
-                        <p class="text-xs text-gray-400 mt-2">有效期：永久有效</p>
+                        <p class="text-xs text-gray-400 mt-2"><i class="fas fa-history mr-1"></i>珍惜使用，仅限 1 张</p>
                     </div>
                     <div class="border-l-2 border-dashed border-red-200 pl-4 flex flex-col items-center justify-center">
-                        <i class="fas fa-smile-beam text-3xl text-red-300 mb-2"></i>
-                        <button class="px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600">使用</button>
+                        <i class="fas fa-smile-beam text-3xl text-red-300 mb-2 group-hover:text-red-500 transition"></i>
+                        <button onclick="tryRedeem('forgive', '消气券')" class="coupon-btn px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600 transition shadow-md">点击使用</button>
                     </div>
                 </div>
-                <div class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition">
+
+                <!-- 清空购物车 -->
+                <div id="coupon-cart" class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition relative group">
+                    <div class="stamp">已核销 CERTIFIED</div>
                     <div class="flex-1">
                         <h3 class="font-bold text-2xl text-red-500 mb-2">清空购物车</h3>
                         <p class="text-gray-500 text-sm">预算范围内，买你喜欢的一个礼物</p>
-                        <p class="text-xs text-gray-400 mt-2">有效期：本年度</p>
+                        <p class="text-xs text-gray-400 mt-2"><i class="fas fa-history mr-1"></i>年度大奖，限 1 次</p>
                     </div>
                     <div class="border-l-2 border-dashed border-red-200 pl-4 flex flex-col items-center justify-center">
-                        <i class="fas fa-shopping-bag text-3xl text-red-300 mb-2"></i>
-                        <button class="px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600">使用</button>
+                        <i class="fas fa-shopping-bag text-3xl text-red-300 mb-2 group-hover:text-red-500 transition"></i>
+                        <button onclick="tryRedeem('cart', '清空购物车')" class="coupon-btn px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600 transition shadow-md">点击使用</button>
                     </div>
                 </div>
-                <div class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition">
+
+                <!-- 大餐券 -->
+                <div id="coupon-food" class="coupon-card bg-white p-6 rounded-lg flex items-center justify-between shadow-md hover:shadow-xl transition relative group">
+                    <div class="stamp">已核销 CERTIFIED</div>
                     <div class="flex-1">
                         <h3 class="font-bold text-2xl text-red-500 mb-2">大餐券</h3>
                         <p class="text-gray-500 text-sm">想吃什么随便点，我买单/我做饭</p>
-                        <p class="text-xs text-gray-400 mt-2">有效期：永久有效</p>
+                        <p class="text-xs text-gray-400 mt-2"><i class="fas fa-history mr-1"></i>季度限用 1 次</p>
                     </div>
                     <div class="border-l-2 border-dashed border-red-200 pl-4 flex flex-col items-center justify-center">
-                        <i class="fas fa-utensils text-3xl text-red-300 mb-2"></i>
-                        <button class="px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600">使用</button>
+                        <i class="fas fa-utensils text-3xl text-red-300 mb-2 group-hover:text-red-500 transition"></i>
+                        <button onclick="tryRedeem('food', '大餐券')" class="coupon-btn px-4 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600 transition shadow-md">点击使用</button>
                     </div>
                 </div>
+
             </div>
             
             <div class="text-center mt-12">
@@ -420,6 +492,33 @@
         </div>
     </div>
 
+    <!-- 确认使用模态框 (Confirm Modal) -->
+    <div id="confirmModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center px-4">
+        <!-- 背景遮罩 -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity opacity-0" id="modalBackdrop"></div>
+        
+        <!-- 弹窗内容 -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full relative transform scale-95 opacity-0 transition-all duration-300" id="modalContent">
+            <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 w-20 h-20 bg-white rounded-full p-2 flex items-center justify-center shadow-lg">
+                <div class="w-full h-full bg-red-100 rounded-full flex items-center justify-center text-3xl text-red-500">
+                    <i class="fas fa-heart-crack"></i>
+                </div>
+            </div>
+            
+            <h3 class="font-hand text-3xl text-center text-gray-800 mt-8 mb-2">真的要使用吗？</h3>
+            <p class="text-center text-gray-500 mb-6 font-serif leading-relaxed">
+                这是给你的专属特权<br>
+                一旦使用，我会立刻知道并准备兑现<br>
+                <span class="text-xs text-red-400 block mt-2">( 本年度仅此一次哦 )</span>
+            </p>
+            
+            <div class="flex gap-4">
+                <button onclick="closeModal()" class="flex-1 py-3 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-50 transition">再想想</button>
+                <button onclick="confirmRedeem()" class="flex-1 py-3 bg-red-500 text-white rounded-xl shadow-lg hover:bg-red-600 hover:shadow-red-500/30 transition transform hover:-translate-y-1">确认使用</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const musicBtn = document.getElementById('musicBtn');
         const bgMusic = document.getElementById('bgMusic');
@@ -440,29 +539,14 @@
             isPlaying = false;
         }
         
-        // 错误处理：更具体的错误提示
         function handleMusicError(e) {
-            console.error("Music Error Details:", bgMusic.error); // Log the actual error object
-            let msg = "未知错误";
-            if (bgMusic.error) {
-                 switch(bgMusic.error.code) {
-                    case 1: msg = "用户终止 (MEDIA_ERR_ABORTED)"; break;
-                    case 2: msg = "网络错误 (MEDIA_ERR_NETWORK)"; break;
-                    case 3: msg = "解码错误 (MEDIA_ERR_DECODE)"; break;
-                    case 4: msg = "文件不可用 (MEDIA_ERR_SRC_NOT_SUPPORTED)"; break;
-                }
-            }
-            // 只有真正出错才弹窗，避免打扰，忽略中止错误
-            if(bgMusic.error && bgMusic.error.code !== 1) {
-               // 暂时注释掉 alert，避免在预览环境中频繁弹出
-               // alert(`⚠️ 音乐播放失败：${msg}`);
-            }
+            console.error("Music Error Details:", bgMusic.error); 
             setPausedState();
         }
 
-        // 优化点：页面加载时尝试预加载 - 移除 fetch, 直接 load
         window.addEventListener('load', () => {
             bgMusic.load();
+            loadCouponsState(); // 加载兑换券状态
         });
 
         bgMusic.addEventListener('waiting', () => { console.log("缓冲中..."); setLoadingState(); });
@@ -511,6 +595,90 @@
             if (pageId === 'home') navBar.classList.add('hidden');
             else navBar.classList.remove('hidden');
         }
+
+        // --- 兑换券逻辑 START ---
+        let pendingCouponId = null;
+        let pendingCouponName = null;
+
+        // 加载已保存的状态
+        function loadCouponsState() {
+            const coupons = ['massage', 'forgive', 'cart', 'food'];
+            coupons.forEach(id => {
+                const usedTime = localStorage.getItem('coupon_' + id);
+                if (usedTime) {
+                    markAsUsed(id, usedTime);
+                }
+            });
+        }
+
+        function markAsUsed(id, timeStr) {
+            const card = document.getElementById('coupon-' + id);
+            if (!card) return;
+            
+            card.classList.add('used');
+            const btn = card.querySelector('button');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-check mr-1"></i>已于 ${timeStr} 兑现`;
+            btn.classList.remove('bg-red-500', 'hover:bg-red-600');
+            btn.classList.add('bg-gray-400', 'cursor-not-allowed');
+        }
+
+        function tryRedeem(id, name) {
+            pendingCouponId = id;
+            pendingCouponName = name;
+            
+            const modal = document.getElementById('confirmModal');
+            const backdrop = document.getElementById('modalBackdrop');
+            const content = document.getElementById('modalContent');
+            
+            modal.classList.remove('hidden');
+            // Small delay for CSS transition
+            setTimeout(() => {
+                backdrop.classList.remove('opacity-0');
+                content.classList.remove('opacity-0', 'scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('confirmModal');
+            const backdrop = document.getElementById('modalBackdrop');
+            const content = document.getElementById('modalContent');
+            
+            backdrop.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('opacity-0', 'scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                pendingCouponId = null;
+            }, 300);
+        }
+
+        function confirmRedeem() {
+            if (!pendingCouponId) return;
+
+            const now = new Date();
+            const timeStr = `${now.getFullYear()}.${now.getMonth()+1}.${now.getDate()}`;
+            
+            // 1. 保存状态
+            localStorage.setItem('coupon_' + pendingCouponId, timeStr);
+            
+            // 2. 更新UI
+            markAsUsed(pendingCouponId, timeStr);
+            
+            // 3. 庆祝动画
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ef4444', '#f87171']
+            });
+            
+            closeModal();
+        }
+        // --- 兑换券逻辑 END ---
+
 
         // --- 理由列表 ---
         const reasons = [
@@ -593,6 +761,35 @@
             "因为每天多爱你一点"
         ];
 
+        // --- 未来约定列表 ---
+        const futurePromises = [
+            "我们将一起去冰岛看极光，在欧若拉下许愿",
+            "我们会一起养一只叫'年糕'的小猫，看它在阳光下打滚",
+            "我们将一起去迪士尼看烟花，在城堡前拥抱",
+            "我们会一起把家装修成温暖的奶油风",
+            "我们将每年拍一张同样的合影，直到白头偕老",
+            "我们会一起学会做一道复杂的法式甜点",
+            "我们将一起去听一场周杰伦的演唱会，大声合唱",
+            "我们会一起去海边买一所房子，面朝大海春暖花开",
+            "我们将一起完成一次没有目的地的公路旅行",
+            "我们会等到八十岁，还要手牵手去公园散步",
+            "我们将一起去探索海底世界，考潜水证",
+            "我们会在属于我们的小窝里，一起窝在沙发看投影电影",
+            "我们将手牵手漫步在异国的街头，假装是当地人",
+            "我们会一起做一本只属于我们的回忆相册",
+            "我们将一起去坐热气球，俯瞰这个世界",
+            "我们会学会做对方最爱吃的一道菜",
+            "我们将领养一只流浪小动物，给它一个温暖的家",
+            "我们会一起去露营，数天上的星星",
+            "我们将存钱去一次南极/北极",
+            "我们会在每个结婚纪念日都重温一次第一次约会",
+            "我们将一起种一棵树，看着它和我们的爱情一起长大",
+            "我们会一起去跳伞/蹦极，体验心跳加速的感觉",
+            "我们将一起逛宜家，为家里添置可爱的小物件",
+            "我们会一起去滑雪，在雪地里打滚",
+            "我们将一起看遍世间所有的日出和日落"
+        ];
+
         const config = {
             startDate: "2025-04-14T00:00:00", 
             loveLetter: "亲爱的，\n不知不觉我们已经走过了一年。\n感谢你包容我的小脾气，\n感谢你带来的所有温暖。\n未来的日子很长，\n但我只想和你一起慢慢变老。\n一周年快乐！❤️"
@@ -607,6 +804,36 @@
                 display.style.opacity = 1;
             }, 300);
             confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 }, colors: ['#ffb6c1', '#ff69b4'] });
+        }
+        
+        function displayNextPromise() {
+            const display = document.getElementById('promiseDisplay');
+            const randomPromise = futurePromises[Math.floor(Math.random() * futurePromises.length)];
+            
+            display.style.opacity = 0;
+            
+            setTimeout(() => {
+                display.innerText = randomPromise;
+                display.style.opacity = 1;
+            }, 300);
+            
+            const count = 200;
+            const defaults = {
+                origin: { y: 0.8 },
+                colors: ['#6366f1', '#a855f7', '#fbbf24'] 
+            };
+
+            function fire(particleRatio, opts) {
+                confetti(Object.assign({}, defaults, opts, {
+                    particleCount: Math.floor(count * particleRatio)
+                }));
+            }
+
+            fire(0.25, { spread: 26, startVelocity: 55 });
+            fire(0.2, { spread: 60 });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
         }
 
         function updateTimer() {
