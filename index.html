@@ -146,8 +146,7 @@
             <i class="fas fa-music"></i>
         </button>
         <!-- 
-            修正：移除 onerror 的直接调用，改用 JS 监听。
-            preload="auto" 配合浏览器缓存实现最快加载。
+            Github 上传提示：确保 music.mp3 文件也在同一个根目录下。
         -->
         <audio id="bgMusic" loop preload="auto">
             <source src="music.mp3" type="audio/mpeg">
@@ -190,6 +189,7 @@
         
         <section class="min-h-screen flex flex-col items-center justify-center relative px-4 text-center">
             <div class="absolute inset-0 z-[-1]">
+                <!-- 背景图也可以替换为本地图片，例如 src="bg.jpg" -->
                 <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover opacity-20" alt="Background">
                 <div class="absolute inset-0 bg-gradient-to-b from-transparent via-red-50/50 to-red-50"></div>
             </div>
@@ -253,18 +253,25 @@
             </div>
         </section>
 
+        <!-- 
+            Github 图片替换区域
+            请确保将 love1.jpg, love2.jpg, love3.jpg 上传到与此 html 文件相同的文件夹中
+        -->
         <section class="py-20 bg-white">
             <div class="max-w-6xl mx-auto px-4">
                 <h2 class="text-center font-hand text-4xl text-red-800 mb-12 reveal">甜蜜瞬间</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="relative h-80 rounded-2xl overflow-hidden group reveal photo-card">
-                        <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=1974&auto=format&fit=crop" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                        <!-- 替换为 love1.jpg -->
+                        <img src="love1.jpg" onerror="this.src='https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=1974&auto=format&fit=crop'; console.log('Image love1.jpg not found, using fallback.');" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="Sweet Moment 1">
                     </div>
                     <div class="relative h-80 rounded-2xl overflow-hidden group reveal photo-card">
-                        <img src="https://images.unsplash.com/photo-1621091211034-53136cc1eb32?q=80&w=1974&auto=format&fit=crop" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                        <!-- 替换为 love2.jpg -->
+                        <img src="love2.jpg" onerror="this.src='https://images.unsplash.com/photo-1621091211034-53136cc1eb32?q=80&w=1974&auto=format&fit=crop'; console.log('Image love2.jpg not found, using fallback.');" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="Sweet Moment 2">
                     </div>
                     <div class="relative h-80 rounded-2xl overflow-hidden group reveal photo-card">
-                        <img src="https://images.unsplash.com/photo-1516054575922-f0b8eeadec1a?q=80&w=1974&auto=format&fit=crop" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                        <!-- 替换为 love3.jpg -->
+                        <img src="love3.jpg" onerror="this.src='https://images.unsplash.com/photo-1516054575922-f0b8eeadec1a?q=80&w=1974&auto=format&fit=crop'; console.log('Image love3.jpg not found, using fallback.');" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="Sweet Moment 3">
                     </div>
                 </div>
             </div>
